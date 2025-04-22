@@ -9,6 +9,7 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const Navbar = () => {
   const navigate = useNavigate();
@@ -16,9 +17,9 @@ export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
-  // Sample state for demo purposes - in a real app would come from auth context
-  const [user, setUser] = useState<null | {name: string; avatar?: string}>(null);
-
+  // Get auth state from AuthContext
+  const { authState, logout, isAuthenticated } = useAuth();
+  
   // Monitor scroll position
   useEffect(() => {
     const handleScroll = () => {
@@ -28,6 +29,12 @@ export const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Handle logout
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   // Navigation items
   const navigationItems = [
@@ -50,7 +57,7 @@ export const Navbar = () => {
       <div className="container mx-auto px-4 flex justify-between items-center">
         {/* Logo */}
         <div 
-          className="flex items-center cursor-pointer" 
+          className="flex items-center cursor-pointer hover:scale-105 transition-transform" 
           onClick={() => navigate("/")}
         >
           <div className="relative h-10 w-10">
@@ -72,7 +79,7 @@ export const Navbar = () => {
               key={item.name}
               variant={location.pathname === item.path ? "default" : "ghost"}
               className={cn(
-                "px-3 py-2 rounded-lg transition-all",
+                "px-3 py-2 rounded-lg transition-all hover:scale-105",
                 location.pathname === item.path 
                   ? "bg-primary/90 text-white shadow-sm" 
                   : "hover:bg-primary/10"
@@ -88,12 +95,12 @@ export const Navbar = () => {
         <div className="flex items-center space-x-2">
           <ThemeToggle className="h-9 w-9" />
           
-          {user ? (
+          {isAuthenticated && authState.user ? (
             <>
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="relative"
+                className="relative hover:scale-110 transition-transform"
                 onClick={() => navigate("/notifications")}
               >
                 <Bell className="h-5 w-5" />
@@ -102,26 +109,35 @@ export const Navbar = () => {
               </Button>
               
               <Avatar
-                className="h-9 w-9 cursor-pointer transition-all hover:ring-2 hover:ring-primary/50"
+                className="h-9 w-9 cursor-pointer transition-all hover:ring-2 hover:ring-primary/50 hover:scale-110"
                 onClick={() => navigate("/profile")}
               >
-                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarImage src={authState.user.avatar} alt={authState.user.name} />
                 <AvatarFallback className="bg-hackathon-blue text-white">
-                  {user.name.substring(0, 2).toUpperCase()}
+                  {authState.user.name.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
+              
+              {/* Logout button */}
+              <Button
+                variant="ghost"
+                className="hover:bg-red-500/10 hover:text-red-500 transition-colors hover:scale-105"
+                onClick={handleLogout}
+              >
+                Log out
+              </Button>
             </>
           ) : (
             <>
               <Button
                 variant="ghost"
-                className="hidden sm:flex"
+                className="hidden sm:flex hover:scale-105 transition-transform"
                 onClick={() => navigate("/login")}
               >
                 Log in
               </Button>
               <Button
-                className="btn-primary"
+                className="btn-primary hover:scale-105 transition-transform"
                 onClick={() => navigate("/register")}
               >
                 Sign up
@@ -133,7 +149,7 @@ export const Navbar = () => {
           <Button 
             variant="ghost" 
             size="icon" 
-            className="md:hidden"
+            className="md:hidden hover:scale-110 transition-transform"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -151,7 +167,7 @@ export const Navbar = () => {
                   key={item.name}
                   variant="ghost"
                   className={cn(
-                    "justify-start px-3 py-6 h-auto",
+                    "justify-start px-3 py-6 h-auto hover:scale-105 transition-transform",
                     location.pathname === item.path && "bg-primary/10"
                   )}
                   onClick={() => {
@@ -164,10 +180,10 @@ export const Navbar = () => {
                 </Button>
               ))}
               
-              {!user && (
+              {!isAuthenticated ? (
                 <Button
                   variant="ghost"
-                  className="justify-start"
+                  className="justify-start hover:scale-105 transition-transform"
                   onClick={() => {
                     navigate("/login");
                     setMobileMenuOpen(false);
@@ -175,6 +191,18 @@ export const Navbar = () => {
                 >
                   <User className="mr-2 h-5 w-5" />
                   Log in
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  className="justify-start text-red-500 hover:bg-red-500/10 hover:scale-105 transition-transform"
+                  onClick={() => {
+                    handleLogout();
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <User className="mr-2 h-5 w-5" />
+                  Log out
                 </Button>
               )}
             </nav>
