@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -23,7 +22,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 
-// Form schema with validation
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
@@ -43,13 +41,12 @@ const formSchema = z.object({
 
 export const RegisterForm = () => {
   const navigate = useNavigate();
-  const { login, authState, isAuthenticated } = useAuth();
+  const { register: registerUser, login, authState, isAuthenticated } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [role, setRole] = useState<UserRole>("student");
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       switch (authState.user?.role) {
@@ -84,33 +81,25 @@ export const RegisterForm = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
-    
     try {
-      // In a real app, this would call a register API and then login
-      console.log("Registering with:", values, "Role:", role);
-      
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      
-      // After successful registration, automatically log the user in
-      const success = await login(values.email, values.password, role);
-      
+      const success = await registerUser(values.name, values.email, values.password, role);
       if (success) {
-        toast.success("Account created successfully!");
-        
-        // Navigation is handled by the useEffect above
+        const loginSuccess = await login(values.email, values.password, role);
+        if (loginSuccess) {
+          toast.success("Account created successfully!");
+        } else {
+          toast.error(authState.error || "Login after register failed");
+        }
       } else {
         toast.error(authState.error || "Failed to create account");
       }
     } catch (error) {
-      console.error("Registration error:", error);
       toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Get role-specific label and icon
   const getRoleDetails = () => {
     switch (role) {
       case "student":
@@ -174,7 +163,6 @@ export const RegisterForm = () => {
             </TabsTrigger>
           </TabsList>
           
-          {/* Form is the same for all tabs */}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField

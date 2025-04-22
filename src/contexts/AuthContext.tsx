@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { User, UserRole, AuthState } from "@/types/auth";
 import { useNavigate } from "react-router-dom";
@@ -23,7 +22,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     error: null,
   });
 
-  // Check for saved auth on component mount
+  function getUsers() {
+    try {
+      return JSON.parse(localStorage.getItem("users") || "[]");
+    } catch {
+      return [];
+    }
+  }
+  function saveUsers(users: User[]) {
+    localStorage.setItem("users", JSON.stringify(users));
+  }
+
   useEffect(() => {
     const savedAuth = localStorage.getItem("auth");
     if (savedAuth) {
@@ -34,14 +43,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           isLoading: false,
           error: null,
         });
-      } catch (error) {
-        console.error("Error parsing saved auth:", error);
-        localStorage.removeItem("auth");
+      } catch {
         setAuthState({
           user: null,
           isLoading: false,
           error: null,
         });
+        localStorage.removeItem("auth");
       }
     } else {
       setAuthState({
@@ -52,30 +60,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  // Register function
   const register = async (name: string, email: string, password: string, role: UserRole): Promise<boolean> => {
     setAuthState({ ...authState, isLoading: true, error: null });
-    
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      
-      // Check if user already exists
-      const savedAuth = localStorage.getItem("auth");
-      if (savedAuth) {
-        const parsedAuth = JSON.parse(savedAuth);
-        if (parsedAuth.user && parsedAuth.user.email === email) {
-          setAuthState({
-            ...authState,
-            isLoading: false,
-            error: "User with this email already exists",
-          });
-          toast.error("User with this email already exists");
-          return false;
-        }
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      let users = getUsers();
+      const existing = users.find((u: User) => u.email === email && u.role === role);
+      if (existing) {
+        setAuthState({
+          ...authState,
+          isLoading: false,
+          error: "User with this email already exists",
+        });
+        toast.error("User with this email already exists");
+        return false;
       }
-      
-      // Create a new user
       const user: User = {
         id: `user_${Math.random().toString(36).substr(2, 9)}`,
         name,
@@ -84,18 +83,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      
-      // Save to state and localStorage
+      users.push({ ...user, password });
+      saveUsers(users);
       setAuthState({
         user,
         isLoading: false,
         error: null,
       });
-      
       localStorage.setItem("auth", JSON.stringify({ user }));
       toast.success(`Welcome ${name}! Your account has been created.`);
       return true;
-    } catch (error) {
+    } catch {
       setAuthState({
         ...authState,
         isLoading: false,
@@ -106,35 +104,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Mock login function (in a real app, this would call an API)
   const login = async (email: string, password: string, role: UserRole): Promise<boolean> => {
     setAuthState({ ...authState, isLoading: true, error: null });
-    
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      
-      // Mock validation (in a real app, this would be done by the server)
-      if (email && password.length >= 6) {
-        // Create a mock user
-        const user: User = {
-          id: `user_${Math.random().toString(36).substr(2, 9)}`,
-          name: email.split('@')[0],
-          email,
-          role,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
-        
-        // Save to state and localStorage
+      await new Promise((resolve) => setTimeout(resolve, 700));
+      const users = getUsers();
+      const matched = users.find(
+        (u: any) =>
+          u.email === email && u.role === role && u.password === password
+      );
+      if (matched) {
+        const { password, ...userRest } = matched;
         setAuthState({
-          user,
+          user: userRest,
           isLoading: false,
           error: null,
         });
-        
-        localStorage.setItem("auth", JSON.stringify({ user }));
-        toast.success(`Welcome back, ${user.name}!`);
+        localStorage.setItem("auth", JSON.stringify({ user: userRest }));
+        toast.success(`Welcome back, ${userRest.name}!`);
         return true;
       } else {
         setAuthState({
@@ -145,7 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         toast.error("Invalid credentials. Please check your email and password.");
         return false;
       }
-    } catch (error) {
+    } catch {
       setAuthState({
         user: null,
         isLoading: false,
@@ -155,26 +142,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return false;
     }
   };
-  
-  // Update user profile information
+
   const updateUserProfile = (userData: Partial<User>) => {
     if (!authState.user) return;
-    
     const updatedUser = {
       ...authState.user,
       ...userData,
       updatedAt: new Date(),
     };
-    
+    let users = getUsers();
+    users = users.map((u: any) =>
+      u.email === authState.user!.email && u.role === authState.user!.role
+        ? { ...updatedUser, password: u.password }
+        : u
+    );
+    saveUsers(users);
     setAuthState({
       ...authState,
       user: updatedUser,
     });
-    
     localStorage.setItem("auth", JSON.stringify({ user: updatedUser }));
     toast.success("Profile updated successfully!");
   };
-  
+
   const logout = () => {
     localStorage.removeItem("auth");
     setAuthState({
@@ -184,16 +174,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     toast.info("You have been logged out.");
   };
-  
+
   return (
-    <AuthContext.Provider value={{ 
-      authState, 
+    <AuthContext.Provider value={{
+      authState,
       login,
       register,
       logout,
       updateUserProfile,
       isAuthenticated: !!authState.user,
-      isLoading: authState.isLoading
+      isLoading: authState.isLoading,
     }}>
       {children}
     </AuthContext.Provider>

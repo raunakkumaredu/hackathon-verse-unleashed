@@ -50,11 +50,11 @@ const AnalyticsPage = () => {
   
   return (
     <DashboardLayout
-      title="Analytics"
-      subtitle="Insights and statistics about your hackathon journey"
+      title={<span className="gradient-text animate-fade-in">Analytics</span>}
+      subtitle={<span className="animate-fade-in">Insights and statistics about your hackathon journey</span>}
       userRole={authState.user?.role}
     >
-      <div className="mb-6 flex justify-end">
+      <div className="mb-6 flex justify-end animate-fade-in animate-delay-100">
         <Select defaultValue="all">
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Filter by time" />
@@ -67,9 +67,9 @@ const AnalyticsPage = () => {
           </SelectContent>
         </Select>
       </div>
-      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card>
+        {/* Make cards bounce/fade in for a young effect */}
+        <Card className="glass-card animate-fade-in animate-delay-100 card-hover">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Hackathons</CardTitle>
           </CardHeader>
@@ -78,8 +78,7 @@ const AnalyticsPage = () => {
             <p className="text-xs text-muted-foreground mt-1">+3 from last year</p>
           </CardContent>
         </Card>
-        
-        <Card>
+        <Card className="glass-card animate-fade-in animate-delay-200 card-hover">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Projects Completed</CardTitle>
           </CardHeader>
@@ -88,8 +87,7 @@ const AnalyticsPage = () => {
             <p className="text-xs text-muted-foreground mt-1">75% completion rate</p>
           </CardContent>
         </Card>
-        
-        <Card>
+        <Card className="glass-card animate-fade-in animate-delay-300 card-hover">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Teams Joined</CardTitle>
           </CardHeader>
@@ -98,8 +96,7 @@ const AnalyticsPage = () => {
             <p className="text-xs text-muted-foreground mt-1">Collaborated with 18 people</p>
           </CardContent>
         </Card>
-        
-        <Card>
+        <Card className="glass-card animate-fade-in animate-delay-400 card-hover">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Achievements</CardTitle>
           </CardHeader>
@@ -109,9 +106,9 @@ const AnalyticsPage = () => {
           </CardContent>
         </Card>
       </div>
-      
+      {/* Add float/fade young vibes on tabs and charts */}
       <Tabs defaultValue="participation">
-        <TabsList className="mb-6">
+        <TabsList className="mb-6 animate-fade-in animate-delay-200">
           <TabsTrigger value="participation" className="flex items-center gap-2">
             <LineChart className="h-4 w-4" /> Participation
           </TabsTrigger>
@@ -125,10 +122,10 @@ const AnalyticsPage = () => {
             <BarChartHorizontal className="h-4 w-4" /> Performance
           </TabsTrigger>
         </TabsList>
-        
+        {/* Each TabsContent uses fade-in/fade-out and young gradients */}
         <TabsContent value="participation">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
+            <Card className="animate-fade-in card-hover">
               <CardHeader>
                 <CardTitle>Hackathon Participation</CardTitle>
                 <CardDescription>Monthly trend of participant numbers</CardDescription>
@@ -148,8 +145,7 @@ const AnalyticsPage = () => {
                 </div>
               </CardContent>
             </Card>
-            
-            <Card>
+            <Card className="animate-fade-in animate-delay-200 card-hover">
               <CardHeader>
                 <CardTitle>User Role Distribution</CardTitle>
                 <CardDescription>Breakdown of participant types</CardDescription>
@@ -181,9 +177,8 @@ const AnalyticsPage = () => {
             </Card>
           </div>
         </TabsContent>
-        
         <TabsContent value="skills">
-          <Card>
+          <Card className="animate-fade-in animate-delay-300 card-hover">
             <CardHeader>
               <CardTitle>Skills Distribution</CardTitle>
               <CardDescription>Most popular skills among participants</CardDescription>
@@ -204,19 +199,17 @@ const AnalyticsPage = () => {
             </CardContent>
           </Card>
         </TabsContent>
-        
         <TabsContent value="demographics">
-          <div className="text-center py-12">
-            <CircleDot className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+          <div className="text-center py-12 animate-fade-in animate-delay-400">
+            <CircleDot className="h-16 w-16 mx-auto mb-4 text-muted-foreground animate-float" />
             <h3 className="text-xl font-semibold">Demographics Analysis Coming Soon</h3>
             <p className="text-muted-foreground max-w-md mx-auto mt-2">
               We're collecting more data to provide detailed demographics insights for our hackathon community.
             </p>
           </div>
         </TabsContent>
-        
         <TabsContent value="performance">
-          <Card>
+          <Card className="animate-fade-in animate-delay-600 card-hover">
             <CardHeader>
               <CardTitle>Project Completion Rates</CardTitle>
               <CardDescription>Percentage of completed projects per hackathon</CardDescription>
@@ -238,7 +231,7 @@ const AnalyticsPage = () => {
           </Card>
         </TabsContent>
       </Tabs>
-      
+      {/* Personal Progress Section */}
       <div className="mt-8">
         <h2 className="text-2xl font-semibold mb-6">Your Progress</h2>
         

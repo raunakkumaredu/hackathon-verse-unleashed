@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Award, ChevronRight, Users, Calendar, MessageSquare, Clock } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,13 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { CircleDot } from "lucide-react";
 
 const MentorDashboard = () => {
   const { authState } = useAuth();
   const navigate = useNavigate();
   const user = authState.user;
 
-  // Sample data for the dashboard
   const mentoringSessions = [
     { 
       id: "1", 
@@ -42,77 +41,83 @@ const MentorDashboard = () => {
   ];
 
   return (
-    <DashboardLayout 
-      title={`Mentor Dashboard`}
-      subtitle={`Welcome back${user?.name ? ', ' + user.name : ''}! Track your mentee teams and upcoming sessions.`}
+    <DashboardLayout
+      title={
+        <span className="gradient-text animate-fade-in">
+          Mentor Dashboard
+        </span>
+      }
+      subtitle={
+        <span className="animate-fade-in">
+          {`Welcome back${user?.name ? ', ' + user.name : ''}! Track your mentee teams and upcoming sessions.`}
+        </span>
+      }
       userRole="mentor"
     >
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Main Content - Left 2/3 */}
         <div className="md:col-span-2 space-y-6">
-          {/* Stats Overview */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Card className="glass-card">
+            <Card className="glass-card animate-fade-in animate-delay-100">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground mb-1">Assigned Teams</p>
-                    <h3 className="text-2xl font-bold">3</h3>
+                    <h3 className="text-2xl font-bold gradient-text">3</h3>
                   </div>
-                  <div className="h-12 w-12 rounded-full bg-hackathon-purple/10 flex items-center justify-center">
+                  <div className="h-12 w-12 rounded-full bg-gradient-to-r from-primary to-accent flex items-center justify-center animate-float">
                     <Users className="h-6 w-6 text-hackathon-purple" />
                   </div>
                 </div>
               </CardContent>
             </Card>
-            
-            <Card className="glass-card">
+            <Card className="glass-card animate-fade-in animate-delay-300">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground mb-1">Mentoring Hours</p>
-                    <h3 className="text-2xl font-bold">12</h3>
+                    <h3 className="text-2xl font-bold gradient-text">12</h3>
                   </div>
-                  <div className="h-12 w-12 rounded-full bg-hackathon-blue/10 flex items-center justify-center">
+                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center animate-float">
                     <Clock className="h-6 w-6 text-hackathon-blue" />
                   </div>
                 </div>
               </CardContent>
             </Card>
-            
-            <Card className="glass-card">
+            <Card className="glass-card animate-fade-in animate-delay-500">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground mb-1">Hackathons</p>
-                    <h3 className="text-2xl font-bold">2</h3>
+                    <h3 className="text-2xl font-bold gradient-text">2</h3>
                   </div>
-                  <div className="h-12 w-12 rounded-full bg-hackathon-orange/10 flex items-center justify-center">
+                  <div className="h-12 w-12 rounded-full bg-gradient-to-tr from-primary to-accent flex items-center justify-center animate-float">
                     <Award className="h-6 w-6 text-hackathon-orange" />
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
-          
-          {/* Upcoming Mentoring Sessions */}
-          <Card className="glass-card">
+
+          <Card className="glass-card animate-fade-in animate-delay-700 card-hover">
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Calendar className="h-5 w-5 mr-2" />
+              <CardTitle className="flex items-center gap-2 text-hackathon-purple">
+                <Calendar className="h-5 w-5 mr-2 pulse" />
                 Upcoming Sessions
               </CardTitle>
-              <CardDescription>Your scheduled mentoring sessions</CardDescription>
+              <CardDescription className="gradient-text">
+                Your scheduled mentoring sessions
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {mentoringSessions.map((session) => (
-                  <div 
+                {mentoringSessions.map((session, idx) => (
+                  <div
                     key={session.id}
-                    className="flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                    className={`flex items-center p-3 rounded-lg cursor-pointer transition-all hover:bg-accent/10 group
+                      animate-fade-in animate-delay-${200 + idx * 100}`}
                     onClick={() => navigate(`/mentorship/session/${session.id}`)}
                   >
-                    <Avatar className="h-12 w-12">
+                    <Avatar className="h-12 w-12 hover:scale-110 transition-transform ring-2 ring-primary/50">
                       <AvatarImage src={session.logo} />
                       <AvatarFallback>{session.title.substring(0, 2)}</AvatarFallback>
                     </Avatar>
@@ -124,41 +129,45 @@ const MentorDashboard = () => {
                         </Badge>
                       </div>
                       <div className="flex items-center mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        <Clock className="h-3 w-3 mr-1" />
+                        <Clock className="h-3 w-3 mr-1 animate-pulse" />
                         {session.date}
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        Project: {session.project}
+                        Project: <span className="gradient-text">{session.project}</span>
                       </div>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-gray-400" />
+                    <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-primary transition-colors" />
                   </div>
                 ))}
               </div>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full" onClick={() => navigate("/mentorship/schedule")}>
+              <Button variant="outline" className="w-full hover-scale" onClick={() => navigate("/mentorship/schedule")}>
                 Schedule New Session
               </Button>
             </CardFooter>
           </Card>
-          
-          {/* Team Progress */}
-          <Card className="glass-card">
+
+          <Card className="glass-card animate-fade-in animate-delay-900 card-hover">
             <CardHeader>
-              <CardTitle className="flex items-center">
+              <CardTitle className="flex items-center gap-2 text-hackathon-blue">
                 <Users className="h-5 w-5 mr-2" />
                 Team Progress
               </CardTitle>
-              <CardDescription>Track your teams' development</CardDescription>
+              <CardDescription className="gradient-text">
+                Track your teams' development
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {assignedTeams.map((team) => (
-                  <div key={team.id} className="space-y-2">
+                {assignedTeams.map((team, idx) => (
+                  <div
+                    key={team.id}
+                    className={`space-y-2 animate-fade-in animate-delay-${300 + idx * 100}`}
+                  >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <Avatar className="h-8 w-8 mr-2">
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-8 w-8 mr-2 hover:scale-110 transition-transform ring-2 ring-accent/70">
                           <AvatarImage src={team.avatar} />
                           <AvatarFallback>{team.name.substring(0, 2)}</AvatarFallback>
                         </Avatar>
@@ -167,53 +176,50 @@ const MentorDashboard = () => {
                           <p className="text-xs text-gray-500">{team.members} members</p>
                         </div>
                       </div>
-                      <span className="text-sm font-medium">{team.progress}%</span>
+                      <span className="text-sm font-medium gradient-text">{team.progress}%</span>
                     </div>
-                    <Progress value={team.progress} className="h-2" />
+                    <Progress value={team.progress} className="h-2 rounded-full" />
                   </div>
                 ))}
               </div>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full" onClick={() => navigate("/teams")}>
+              <Button variant="outline" className="w-full hover-scale" onClick={() => navigate("/teams")}>
                 View All Teams
               </Button>
             </CardFooter>
           </Card>
         </div>
-        
-        {/* Sidebar - Right 1/3 */}
+
         <div className="space-y-6">
-          {/* Mentor Profile */}
-          <Card className="glass-card">
-            <CardContent className="pt-6">
-              <div className="flex flex-col items-center">
-                <Avatar className="h-20 w-20 mb-4">
-                  <AvatarImage src={`https://ui-avatars.com/api/?name=${user?.name?.charAt(0) || 'M'}&background=random`} />
-                  <AvatarFallback>{user?.name?.charAt(0) || 'M'}</AvatarFallback>
-                </Avatar>
-                <h3 className="text-xl font-semibold">{user?.name || "Mentor Name"}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Senior Tech Advisor</p>
-                <div className="flex space-x-2 mb-4">
-                  <Badge variant="secondary">AI/ML</Badge>
-                  <Badge variant="secondary">Web Dev</Badge>
-                  <Badge variant="secondary">IoT</Badge>
-                </div>
-                <Button variant="outline" size="sm" className="w-full" onClick={() => navigate("/profile")}>
-                  Edit Mentor Profile
-                </Button>
+          <Card className="glass-card animate-fade-in animate-delay-900">
+            <CardContent className="pt-6 flex flex-col items-center">
+              <Avatar className="h-20 w-20 mb-4 hover:scale-110 transition-all ring-2 ring-primary/50 animate-float">
+                <AvatarImage src={`https://ui-avatars.com/api/?name=${user?.name?.charAt(0) || 'M'}&background=random`} />
+                <AvatarFallback>{user?.name?.charAt(0) || 'M'}</AvatarFallback>
+              </Avatar>
+              <h3 className="text-xl font-semibold gradient-text">{user?.name || "Mentor Name"}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Senior Tech Advisor</p>
+              <div className="flex space-x-2 mb-4">
+                <Badge variant="secondary">AI/ML</Badge>
+                <Badge variant="secondary">Web Dev</Badge>
+                <Badge variant="secondary">IoT</Badge>
               </div>
+              <Button variant="outline" size="sm" className="w-full hover-scale" onClick={() => navigate("/profile")}>
+                Edit Mentor Profile
+              </Button>
             </CardContent>
           </Card>
-          
-          {/* Unread Messages */}
-          <Card className="glass-card">
+
+          <Card className="glass-card animate-fade-in animate-delay-1100">
             <CardHeader>
               <CardTitle className="text-base flex items-center">
                 <MessageSquare className="h-4 w-4 mr-2" />
                 Team Messages
               </CardTitle>
-              <CardDescription>Recent team communications</CardDescription>
+              <CardDescription className="gradient-text">
+                Recent team communications
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -238,14 +244,13 @@ const MentorDashboard = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" size="sm" className="w-full" onClick={() => navigate("/collaboration")}>
+              <Button variant="outline" size="sm" className="w-full hover-scale" onClick={() => navigate("/collaboration")}>
                 View All Messages
               </Button>
             </CardFooter>
           </Card>
-          
-          {/* Quick Actions */}
-          <Card className="glass-card">
+
+          <Card className="glass-card animate-fade-in animate-delay-1300">
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Quick Actions</CardTitle>
             </CardHeader>
@@ -261,9 +266,8 @@ const MentorDashboard = () => {
               </Button>
             </CardContent>
           </Card>
-          
-          {/* Mentor Resources */}
-          <Card className="glass-card">
+
+          <Card className="glass-card animate-fade-in animate-delay-1500">
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Mentor Resources</CardTitle>
             </CardHeader>
@@ -282,7 +286,7 @@ const MentorDashboard = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" size="sm" className="w-full" onClick={() => navigate("/resources")}>
+              <Button variant="outline" size="sm" className="w-full hover-scale" onClick={() => navigate("/resources")}>
                 All Resources
               </Button>
             </CardFooter>
