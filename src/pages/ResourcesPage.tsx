@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -13,8 +12,8 @@ import { toast } from "sonner";
 const ResourcesPage = () => {
   const { authState } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
-  
-  // Mock resource data (with smaller Unsplash images)
+  const [accessingResource, setAccessingResource] = useState<string | null>(null);
+
   const resources = [
     {
       id: "1",
@@ -64,14 +63,13 @@ const ResourcesPage = () => {
       link: "#"
     }
   ];
-  
-  // Filter resources based on search query
+
   const filteredResources = resources.filter(resource => 
     resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     resource.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
     resource.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
   );
-  
+
   const getResourceIcon = (type: string) => {
     switch (type) {
       case "tutorial":
@@ -86,14 +84,13 @@ const ResourcesPage = () => {
         return <FileCode className="h-5 w-5" />;
     }
   };
-  
+
   return (
     <DashboardLayout
       title="Resources"
       subtitle="Learning materials and resources to help you succeed"
       userRole={authState.user?.role}
     >
-      {/* Search and filter */}
       <div className="mb-6">
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -105,8 +102,20 @@ const ResourcesPage = () => {
           />
         </div>
       </div>
-      
-      {/* Resource Categories */}
+
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-2">
+          <Book className="h-5 w-5 text-primary" />
+          <h3 className="text-lg font-semibold">My Teams</h3>
+        </div>
+        <div className="text-muted-foreground text-sm mb-3">
+          Team management will appear here! (You can ask to implement full team management and matchmaking.)
+        </div>
+        <Button variant="outline" size="sm" onClick={() => toast.info("Team match-making coming soon!")}>
+          Find Teammates
+        </Button>
+      </div>
+
       <Tabs defaultValue="all">
         <TabsList className="mb-6">
           <TabsTrigger value="all">All Resources</TabsTrigger>
@@ -115,13 +124,12 @@ const ResourcesPage = () => {
           <TabsTrigger value="documentation">Documentation</TabsTrigger>
           <TabsTrigger value="videos">Videos</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="all" className="space-y-6">
           {filteredResources.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredResources.map(resource => (
-                <Card key={resource.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                  {/* Add animated float effect to images */}
+                <Card key={resource.id} className="overflow-hidden hover:shadow-md transition-shadow glass-card">
                   <div className="aspect-video relative bg-muted animate-float">
                     <img src={resource.thumbnail} alt={resource.title} className="object-cover w-full h-full rounded-t-md" />
                     <div className="absolute top-2 right-2">
@@ -130,7 +138,6 @@ const ResourcesPage = () => {
                       </Badge>
                     </div>
                   </div>
-                  
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <span className="text-primary">
@@ -140,12 +147,10 @@ const ResourcesPage = () => {
                     </CardTitle>
                     <CardDescription>{resource.author}</CardDescription>
                   </CardHeader>
-                  
                   <CardContent className="space-y-4">
                     <p className="text-sm text-muted-foreground">
                       {resource.description}
                     </p>
-                    
                     <div className="flex flex-wrap gap-2">
                       {resource.tags.map(tag => (
                         <Badge key={tag} variant="outline" className="bg-primary/5">
@@ -153,7 +158,6 @@ const ResourcesPage = () => {
                         </Badge>
                       ))}
                     </div>
-                    
                     <div className="flex justify-between items-center pt-2">
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary" className="bg-muted">
@@ -163,12 +167,31 @@ const ResourcesPage = () => {
                           <span className="text-xs text-muted-foreground">{resource.duration}</span>
                         )}
                       </div>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => toast.info("Resource access coming soon!")}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={accessingResource === resource.id}
+                        className={`relative transition-all duration-150 ${
+                          accessingResource === resource.id ? "opacity-70 cursor-wait" : ""
+                        }`}
+                        onClick={() => {
+                          setAccessingResource(resource.id);
+                          setTimeout(() => {
+                            setAccessingResource(null);
+                            toast.success("Resource accessed! 🎉");
+                          }, 1100);
+                        }}
                       >
-                        Access <Download className="ml-2 h-3 w-3" />
+                        {accessingResource === resource.id ? (
+                          <span className="flex items-center">
+                            <span className="w-4 h-4 border-2 border-current border-t-transparent animate-spin rounded-full mr-2"></span>
+                            Loading...
+                          </span>
+                        ) : (
+                          <>
+                            Access <Download className="ml-2 h-3 w-3" />
+                          </>
+                        )}
                       </Button>
                     </div>
                   </CardContent>
@@ -187,34 +210,32 @@ const ResourcesPage = () => {
             </div>
           )}
         </TabsContent>
-        
-        {/* Other tabs would have similar content, filtered by type */}
+
         <TabsContent value="tutorials">
           <div className="py-8 text-center">
             <p>Filtered tutorials will appear here</p>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="courses">
           <div className="py-8 text-center">
             <p>Filtered courses will appear here</p>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="documentation">
           <div className="py-8 text-center">
             <p>Filtered documentation will appear here</p>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="videos">
           <div className="py-8 text-center">
             <p>Filtered videos will appear here</p>
           </div>
         </TabsContent>
       </Tabs>
-      
-      {/* Recommended Resources */}
+
       <div className="mt-12">
         <h2 className="text-2xl font-semibold mb-6">Recommended for You</h2>
         
@@ -279,4 +300,3 @@ const ResourcesPage = () => {
 };
 
 export default ResourcesPage;
-

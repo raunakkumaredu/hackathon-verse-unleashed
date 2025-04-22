@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -12,7 +11,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Network, Users, Trophy, Award, GraduationCap, Rocket, Flag, Briefcase, Calendar } from "lucide-react";
 import { toast } from "sonner";
 
-// Mock data for networking profiles
 const mockProfiles = [
   {
     id: "1",
@@ -82,7 +80,6 @@ const mockProfiles = [
   },
 ];
 
-// Mock data for upcoming networking events
 const networkingEvents = [
   {
     id: "1",
@@ -117,20 +114,33 @@ const NetworkingPage = () => {
   const { authState } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("people");
-  
+  const [pendingConnections, setPendingConnections] = useState<string[]>([]);
+  const [emailLoading, setEmailLoading] = useState<string | null>(null);
+
   const filteredProfiles = mockProfiles.filter((profile) =>
-    profile.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    profile.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     profile.skills.some(skill => skill.toLowerCase().includes(searchQuery.toLowerCase()))
   );
-  
+
   const handleConnect = (profileId: string) => {
-    toast.success("Connection request sent!");
+    setPendingConnections((prev) => [...prev, profileId]);
+    setTimeout(() => {
+      toast.success("Connection request sent!");
+    }, 800);
   };
-  
+
   const handleEventRegister = (eventId: string) => {
     toast.success("Successfully registered for the event!");
   };
-  
+
+  const handleEmailInterested = (profileId: string) => {
+    setEmailLoading(profileId);
+    setTimeout(() => {
+      setEmailLoading(null);
+      toast.success("Email sent to interested candidates!");
+    }, 1200);
+  };
+
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -180,7 +190,7 @@ const NetworkingPage = () => {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {filteredProfiles.length > 0 ? (
                 filteredProfiles.map((profile) => (
-                  <Card key={profile.id} className="overflow-hidden h-full hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
+                  <Card key={profile.id} className="overflow-hidden h-full hover:shadow-lg transition-all duration-300 hover:scale-[1.02] glass-card">
                     <CardHeader className="pb-2">
                       <div className="flex items-start justify-between">
                         <Avatar className="h-12 w-12">
@@ -206,14 +216,46 @@ const NetworkingPage = () => {
                         ))}
                       </div>
                     </CardContent>
-                    <CardFooter className="flex justify-between border-t pt-4 text-xs text-muted-foreground">
+                    <CardFooter className="flex justify-between border-t pt-4 text-xs text-muted-foreground gap-2 flex-wrap">
                       <div className="flex items-center">
                         <Users className="h-3 w-3 mr-1" />
                         {profile.connections} connections
                       </div>
-                      <Button size="sm" onClick={() => handleConnect(profile.id)}>
-                        Connect
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant={pendingConnections.includes(profile.id) ? "outline" : "default"}
+                          disabled={pendingConnections.includes(profile.id)}
+                          onClick={() => handleConnect(profile.id)}
+                          className={pendingConnections.includes(profile.id) ? "opacity-60 cursor-not-allowed" : ""}
+                        >
+                          {pendingConnections.includes(profile.id) ? "Pending" : "Connect"}
+                        </Button>
+                        {(profile.role === "Company Representative" || profile.role === "Mentor") && (
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => handleEmailInterested(profile.id)}
+                            disabled={emailLoading === profile.id}
+                          >
+                            {emailLoading === profile.id ? (
+                              <span className="flex items-center gap-1">
+                                <span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-1"></span>
+                                Sending...
+                              </span>
+                            ) : (
+                              <>
+                                Email Interested
+                                <span className="ml-1">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12l-4-4m0 0l-4 4m4-4v12" />
+                                  </svg>
+                                </span>
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </div>
                     </CardFooter>
                   </Card>
                 ))
