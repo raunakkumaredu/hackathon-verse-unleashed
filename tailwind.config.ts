@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss"
 import { fontFamily } from "tailwindcss/defaultTheme"
 import plugin from "tailwindcss/plugin"
@@ -57,7 +58,10 @@ const config = {
         hackathon: {
           purple: "#9b87f5",
           blue: "#3b82f6",
-          orange: "#f97316",
+          orange: "#f97316", 
+          "secondary-purple": "#7E69AB",
+          pink: "#FF6B6B",
+          dark: "#1A1F2C",
         }
       },
       borderRadius: {

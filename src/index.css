@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -37,7 +38,7 @@
   }
 
   .dark {
-    /* Improved Glassmorphism & contrast for dark mode */
+    /* Improved contrast and readability for dark mode */
     --background: 228 16% 10%;
     --foreground: 213 31% 91%;
     --card: 229 18% 17%;
@@ -48,24 +49,24 @@
     --primary-foreground: 229 18% 17%;
     --secondary: 254 18% 28%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 229 18% 12%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 229 18% 15%;
+    --muted-foreground: 215 20% 75%;
     --accent: 198 94% 39%;
     --accent-foreground: 222 100% 97%;
     --destructive: 354 67% 41%;
     --destructive-foreground: 222 100% 97%;
-    --border: 232 19% 12%;
-    --input: 232 19% 17%;
+    --border: 232 19% 18%;
+    --input: 232 19% 20%;
     --ring: 255 82% 74%;
     --radius: 0.75rem;
-    /* Sidebar and others unchanged */
-    --sidebar-background: 228 16% 10%;
+    /* Sidebar and others improved for dark mode */
+    --sidebar-background: 228 16% 12%;
     --sidebar-foreground: 213 31% 91%;
     --sidebar-primary: 255 82% 74%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 198 94% 39%;
     --sidebar-accent-foreground: 222 100% 97%;
-    --sidebar-border: 232 19% 12%;
+    --sidebar-border: 232 19% 15%;
     --sidebar-ring: 255 82% 74%;
   }
 }
@@ -83,11 +84,17 @@
   html {
     @apply scroll-smooth;
   }
+
+  /* Ensure that when dark mode is toggled, transitions are smooth */
+  :root,
+  .dark {
+    @apply transition-colors duration-300;
+  }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-white/30 dark:bg-white/10 backdrop-blur-md border border-white/30 dark:border-white/20 rounded-xl shadow-lg transition-all duration-300;
+    @apply bg-white/30 dark:bg-black/30 backdrop-blur-md border border-white/30 dark:border-white/10 rounded-xl shadow-lg transition-all duration-300;
     box-shadow: 0 4px 16px 0 rgba(27, 25, 56, 0.10);
   }
   
@@ -118,6 +125,21 @@
   .animate-delayed-fade-in {
     animation: fadeIn 1s ease-in-out forwards;
     opacity: 0;
+  }
+
+  /* Dark mode specific styles */
+  .dark .glass-card {
+    @apply bg-black/40 border-white/10;
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.3);
+  }
+  
+  .dark .btn-primary,
+  .dark .btn-secondary {
+    @apply shadow-lg shadow-primary/20;
+  }
+  
+  .dark .card-hover {
+    @apply hover:shadow-xl hover:shadow-primary/10;
   }
 }
 
