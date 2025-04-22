@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Flag, Calendar, MapPin, Users, Clock, ChevronRight, ArrowRight, Heart, BarChart, Clock3 } from "lucide-react";
+import { Flag, Calendar, MapPin, Users, Clock, ChevronRight, ArrowRight, Heart, BarChart, Clock3, Rocket } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
