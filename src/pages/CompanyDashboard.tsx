@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Building, ChevronRight, Users, Calendar, Trophy, BarChart } from "lucide-react";
+import { Building, ChevronRight, Users, Calendar, Trophy, BarChart, Star } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -15,7 +15,7 @@ const CompanyDashboard = () => {
   const navigate = useNavigate();
   const user = authState.user;
 
-  // Sample data for the dashboard
+  // Enhanced sample data for the dashboard
   const hostedHackathons = [
     { 
       id: "1", 
@@ -23,7 +23,8 @@ const CompanyDashboard = () => {
       date: "May 15-17, 2025", 
       status: "Active",
       participants: 145,
-      logo: "https://ui-avatars.com/api/?name=AI&background=random" 
+      logo: "https://images.unsplash.com/photo-1677442135126-4ecf24b0e381?w=200&h=200&fit=crop",
+      background: "bg-gradient-to-br from-purple-50 to-blue-50"
     },
     { 
       id: "2", 
@@ -31,14 +32,39 @@ const CompanyDashboard = () => {
       date: "June 20-22, 2025", 
       status: "Planning",
       participants: 0,
-      logo: "https://ui-avatars.com/api/?name=BR&background=random" 
+      logo: "https://images.unsplash.com/photo-1639762681057-408e52192e55?w=200&h=200&fit=crop",
+      background: "bg-gradient-to-br from-amber-50 to-orange-50"
     },
   ];
   
   const topTalent = [
-    { id: "1", name: "Alex Johnson", skills: ["AI", "Machine Learning", "Python"], university: "MIT", avatar: "https://ui-avatars.com/api/?name=AJ&background=random" },
-    { id: "2", name: "Sam Smith", skills: ["UX Design", "Frontend", "React"], university: "Stanford", avatar: "https://ui-avatars.com/api/?name=SS&background=random" },
-    { id: "3", name: "Taylor Reed", skills: ["Data Science", "Python", "ML"], university: "Berkeley", avatar: "https://ui-avatars.com/api/?name=TR&background=random" }
+    { 
+      id: "1", 
+      name: "Alex Johnson", 
+      skills: ["AI", "Machine Learning", "Python"], 
+      university: "MIT", 
+      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop",
+      rating: 4.9,
+      projects: 8
+    },
+    { 
+      id: "2", 
+      name: "Sam Smith", 
+      skills: ["UX Design", "Frontend", "React"], 
+      university: "Stanford", 
+      avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop",
+      rating: 4.7,
+      projects: 5
+    },
+    { 
+      id: "3", 
+      name: "Taylor Reed", 
+      skills: ["Data Science", "Python", "ML"], 
+      university: "Berkeley", 
+      avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop",
+      rating: 4.8,
+      projects: 6
+    }
   ];
 
   return (
@@ -95,7 +121,7 @@ const CompanyDashboard = () => {
             </Card>
           </div>
           
-          {/* Hosted Hackathons */}
+          {/* Hosted Hackathons - ENHANCED */}
           <Card className="glass-card">
             <CardHeader>
               <CardTitle className="flex items-center">
@@ -109,29 +135,37 @@ const CompanyDashboard = () => {
                 {hostedHackathons.map((event) => (
                   <div 
                     key={event.id}
-                    className="flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                    className={`flex items-center p-4 rounded-lg ${event.background} border border-gray-100 hover:shadow-md transition-all cursor-pointer animate-float`}
                     onClick={() => navigate(`/hackathon/${event.id}`)}
                   >
-                    <Avatar className="h-12 w-12">
+                    <Avatar className="h-14 w-14 ring-2 ring-white">
                       <AvatarImage src={event.logo} />
                       <AvatarFallback>{event.title.substring(0, 2)}</AvatarFallback>
                     </Avatar>
                     <div className="ml-4 flex-1">
                       <div className="flex items-center justify-between">
-                        <h4 className="font-semibold">{event.title}</h4>
-                        <Badge variant={event.status === "Active" ? "default" : "outline"}>
+                        <h4 className="font-semibold text-lg">{event.title}</h4>
+                        <Badge variant={event.status === "Active" ? "default" : "outline"} className="ml-2">
                           {event.status}
                         </Badge>
                       </div>
-                      <div className="flex items-center mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center mt-1 text-sm text-gray-600 dark:text-gray-300">
                         <Calendar className="h-3 w-3 mr-1" />
                         {event.date}
                       </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {event.participants} participants
+                      <div className="mt-2 flex items-center justify-between">
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {event.participants > 0 ? 
+                            <span className="inline-flex items-center">
+                              <Users className="h-3 w-3 mr-1" /> 
+                              <span>{event.participants} participants</span>
+                            </span> : 
+                            "Registration opening soon"
+                          }
+                        </div>
+                        <ChevronRight className="h-5 w-5 text-gray-400" />
                       </div>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-gray-400" />
                   </div>
                 ))}
               </div>
@@ -209,28 +243,40 @@ const CompanyDashboard = () => {
             </CardContent>
           </Card>
           
-          {/* Top Talent */}
+          {/* Top Talent - ENHANCED */}
           <Card className="glass-card">
             <CardHeader>
               <CardTitle className="text-base">Top Talent</CardTitle>
               <CardDescription>Standout participants from your hackathons</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-5">
               {topTalent.map((talent) => (
-                <div key={talent.id} className="flex items-start">
-                  <Avatar className="h-10 w-10">
+                <div key={talent.id} className="flex items-start bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg hover:shadow-sm transition-all cursor-pointer animate-float">
+                  <Avatar className="h-12 w-12 border-2 border-white">
                     <AvatarImage src={talent.avatar} />
                     <AvatarFallback>{talent.name.substring(0, 2)}</AvatarFallback>
                   </Avatar>
-                  <div className="ml-3">
-                    <p className="font-medium">{talent.name}</p>
+                  <div className="ml-3 flex-1">
+                    <div className="flex items-center justify-between">
+                      <p className="font-medium">{talent.name}</p>
+                      <div className="flex items-center text-amber-500">
+                        <Star className="h-3 w-3 mr-1 fill-current" />
+                        <span className="text-xs font-medium">{talent.rating}</span>
+                      </div>
+                    </div>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{talent.university}</p>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <div className="flex flex-wrap gap-1 mt-2">
                       {talent.skills.map((skill, index) => (
                         <span key={index} className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
                           {skill}
                         </span>
                       ))}
+                    </div>
+                    <div className="mt-2 text-xs text-gray-600">
+                      <span className="inline-flex items-center">
+                        <Trophy className="h-3 w-3 mr-1 text-hackathon-purple" />
+                        {talent.projects} completed projects
+                      </span>
                     </div>
                   </div>
                 </div>
