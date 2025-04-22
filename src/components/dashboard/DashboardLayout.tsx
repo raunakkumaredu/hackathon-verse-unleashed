@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -53,8 +52,8 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  title: string;
-  subtitle?: string;
+  title: React.ReactNode;
+  subtitle?: React.ReactNode;
   userRole: 'student' | 'company' | 'college' | 'mentor';
 }
 
@@ -66,7 +65,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  // Common navigation items
   const commonNavItems = [
     { icon: <LayoutDashboard className="h-5 w-5" />, label: "Dashboard", href: `/${userRole}-dashboard` },
     { icon: <Trophy className="h-5 w-5" />, label: "Challenges", href: "/challenges" },
@@ -74,7 +72,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     { icon: <MessageSquare className="h-5 w-5" />, label: "Messages", href: "/messages" },
   ];
 
-  // Role-specific navigation items
   const roleSpecificNavItems = {
     student: [
       { icon: <Users className="h-5 w-5" />, label: "Teams", href: "/teams" },
@@ -102,9 +99,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-hackathon-dark/30">
-      {/* Sidebar */}
       <aside className="w-64 bg-white dark:bg-hackathon-dark border-r border-gray-200 dark:border-gray-800 hidden md:flex flex-col">
-        {/* Logo */}
         <div 
           className="h-16 flex items-center px-4 border-b border-gray-200 dark:border-gray-800 cursor-pointer"
           onClick={() => navigate("/")}
@@ -120,7 +115,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           </span>
         </div>
         
-        {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-4">
           <div className="space-y-1 px-2">
             {navItems.map((item) => (
@@ -148,7 +142,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           </div>
         </nav>
         
-        {/* User */}
         <div className="p-4 border-t border-gray-200 dark:border-gray-800">
           <div className="flex items-center">
             <Avatar className="h-9 w-9">
@@ -164,9 +157,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         </div>
       </aside>
       
-      {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top navbar */}
         <header className="h-16 bg-white dark:bg-hackathon-dark border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-4">
           <div className="flex items-center md:hidden">
             <Button variant="ghost" size="icon">
@@ -177,7 +168,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             </Button>
           </div>
           
-          {/* Search */}
           <div className="flex-1 max-w-md mx-4 md:mx-0">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -188,7 +178,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             </div>
           </div>
           
-          {/* Actions */}
           <div className="flex items-center space-x-2">
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
@@ -198,7 +187,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           </div>
         </header>
         
-        {/* Content */}
         <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-hackathon-dark/30 p-6">
           <div className="mb-8">
             <h1 className="text-2xl md:text-3xl font-bold gradient-text">{title}</h1>
