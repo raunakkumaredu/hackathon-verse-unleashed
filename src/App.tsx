@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -32,6 +31,7 @@ import AnalyticsPage from "./pages/AnalyticsPage";
 import EventTimelinePage from "./pages/EventTimelinePage";
 import FeedbackPage from "./pages/FeedbackPage";
 import MentorshipPage from "./pages/MentorshipPage";
+import StudentsPage from "./pages/StudentsPage";
 
 // New Pages
 import EventsPage from "./pages/EventsPage";
@@ -192,6 +192,13 @@ const App = () => (
                 <Route path="support" element={
                   <ProtectedRoute>
                     <SupportPage />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Add Students Route */}
+                <Route path="students" element={
+                  <ProtectedRoute allowedRoles={["college"]}>
+                    <StudentsPage />
                   </ProtectedRoute>
                 } />
                 
