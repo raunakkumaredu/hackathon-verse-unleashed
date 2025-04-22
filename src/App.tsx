@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -39,6 +40,9 @@ import SettingsPage from "./pages/SettingsPage";
 import ProgressPage from "./pages/ProgressPage";
 import MessagesPage from "./pages/MessagesPage";
 import SupportPage from "./pages/SupportPage";
+import NotificationsPage from "./pages/NotificationsPage";
+import MenteesPage from "./pages/MenteesPage";
+import AvailabilityPage from "./pages/AvailabilityPage";
 
 const queryClient = new QueryClient();
 
@@ -195,10 +199,29 @@ const App = () => (
                   </ProtectedRoute>
                 } />
                 
-                {/* Add Students Route */}
+                {/* Students Route */}
                 <Route path="students" element={
                   <ProtectedRoute allowedRoles={["college"]}>
                     <StudentsPage />
+                  </ProtectedRoute>
+                } />
+
+                {/* New Routes for Notifications, Mentees and Availability */}
+                <Route path="notifications" element={
+                  <ProtectedRoute>
+                    <NotificationsPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="mentees" element={
+                  <ProtectedRoute allowedRoles={["mentor"]}>
+                    <MenteesPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="availability" element={
+                  <ProtectedRoute allowedRoles={["mentor"]}>
+                    <AvailabilityPage />
                   </ProtectedRoute>
                 } />
                 
