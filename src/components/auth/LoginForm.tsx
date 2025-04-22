@@ -1,11 +1,13 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, ArrowRight, UserRound, Building, School, Award } from "lucide-react";
 import { UserRole } from "@/types/auth";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 import {
   Form,
@@ -28,30 +30,15 @@ const formSchema = z.object({
 
 export const LoginForm = () => {
   const navigate = useNavigate();
+  const { login, authState, isAuthenticated } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [role, setRole] = useState<UserRole>("student");
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
-    
-    // In a real application, this would be an API call
-    try {
-      console.log("Logging in with:", values, "Role:", role);
-      
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
-      // Switch to appropriate dashboard based on role
-      switch (role) {
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      switch (authState.user?.role) {
         case "student":
           navigate("/student-dashboard");
           break;
@@ -67,9 +54,35 @@ export const LoginForm = () => {
         default:
           navigate("/dashboard");
       }
+    }
+  }, [isAuthenticated, authState.user, navigate]);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
+    
+    try {
+      const success = await login(values.email, values.password, role);
+      
+      if (success) {
+        toast.success(`Welcome back! Logged in as ${role}`);
+        
+        // Navigation is handled by the useEffect above
+      } else {
+        if (authState.error) {
+          toast.error(authState.error);
+        }
+      }
     } catch (error) {
       console.error("Login error:", error);
-      // In a real app we'd show an error toast
+      toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
