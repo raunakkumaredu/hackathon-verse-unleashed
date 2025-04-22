@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,10 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Calendar, MessageSquare } from "lucide-react";
+import MessageModal from "@/components/ui/MessageModal";
+import Modal from "@/components/ui/Modal";
 
 const MenteesPage = () => {
   const { authState } = useAuth();
   const userRole = authState.user?.role || "mentor";
+  const [modal, setModal] = useState<{ type?: "message" | "schedule", mentee?: any } | null>(null);
 
   const mentees = [
     {
@@ -110,11 +112,11 @@ const MenteesPage = () => {
                 </div>
                 
                 <div className="flex justify-between pt-2">
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => setModal({ type: "schedule", mentee })}>
                     <Calendar className="h-4 w-4 mr-2" />
                     Schedule
                   </Button>
-                  <Button size="sm">
+                  <Button size="sm" onClick={() => setModal({ type: "message", mentee })}>
                     <MessageSquare className="h-4 w-4 mr-2" />
                     Message
                   </Button>
@@ -123,6 +125,14 @@ const MenteesPage = () => {
             </Card>
           ))}
         </div>
+        {modal?.type === "message" && (
+          <MessageModal open onClose={() => setModal(null)} title={`Message ${modal.mentee?.name}`} />
+        )}
+        {modal?.type === "schedule" && (
+          <Modal open onClose={() => setModal(null)} title={`Schedule with ${modal.mentee?.name}`}>
+            <div className="text-center p-4">Scheduling functionality coming soon!</div>
+          </Modal>
+        )}
       </div>
     </DashboardLayout>
   );

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Award, ChevronRight, Users, Calendar, MessageSquare, Clock } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { CircleDot } from "lucide-react";
+import Modal from "@/components/ui/Modal";
 
 const MentorDashboard = () => {
   const { authState } = useAuth();
@@ -39,6 +40,9 @@ const MentorDashboard = () => {
     { id: "2", name: "DevDynamos", members: 3, progress: 40, avatar: "https://ui-avatars.com/api/?name=DD&background=random" },
     { id: "3", name: "Byte Brigade", members: 5, progress: 25, avatar: "https://ui-avatars.com/api/?name=BB&background=random" }
   ];
+
+  const [sessionModal, setSessionModal] = useState<{ open: boolean; session?: any } | null>(null);
+  const [scheduleModal, setScheduleModal] = useState<boolean>(false);
 
   return (
     <DashboardLayout
@@ -115,7 +119,7 @@ const MentorDashboard = () => {
                     key={session.id}
                     className={`flex items-center p-3 rounded-lg cursor-pointer transition-all hover:bg-accent/10 group
                       animate-fade-in animate-delay-${200 + idx * 100}`}
-                    onClick={() => navigate(`/mentorship/session/${session.id}`)}
+                    onClick={() => setSessionModal({ open: true, session })}
                   >
                     <Avatar className="h-12 w-12 hover:scale-110 transition-transform ring-2 ring-primary/50">
                       <AvatarImage src={session.logo} />
@@ -142,7 +146,8 @@ const MentorDashboard = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full hover-scale" onClick={() => navigate("/mentorship/schedule")}>
+              <Button variant="outline" className="w-full hover-scale"
+                onClick={() => setScheduleModal(true)}>
                 Schedule New Session
               </Button>
             </CardFooter>
@@ -293,6 +298,29 @@ const MentorDashboard = () => {
           </Card>
         </div>
       </div>
+      {sessionModal?.open && (
+        <Modal open={sessionModal.open} onClose={() => setSessionModal(null)} title="Session Details">
+          <div className="text-lg font-semibold mb-2">{sessionModal.session.title}</div>
+          <div className="mb-2">
+            <span className="font-medium">Date:</span> {sessionModal.session.date}
+          </div>
+          <div className="mb-2">
+            <span className="font-medium">Project:</span> {sessionModal.session.project}
+          </div>
+          <div>
+            <Badge variant={sessionModal.session.status === "Upcoming" ? "default" : "outline"}>
+              {sessionModal.session.status}
+            </Badge>
+          </div>
+        </Modal>
+      )}
+      {scheduleModal && (
+        <Modal open={scheduleModal} onClose={() => setScheduleModal(false)} title="Schedule New Session">
+          <div>
+            <p>This is a placeholder for scheduling a new session.</p>
+          </div>
+        </Modal>
+      )}
     </DashboardLayout>
   );
 };

@@ -33,28 +33,26 @@ export function ThemeProvider({
 
   useEffect(() => {
     const root = window.document.documentElement;
-    
     root.classList.remove("light", "dark");
-    
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
       root.classList.add(systemTheme);
-      return;
+    } else {
+      root.classList.add(theme);
     }
-
-    root.classList.add(theme);
+    // BG color for dark mode
+    if (theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+      root.style.backgroundColor = "#17172a";
+      root.style.colorScheme = "dark";
+    } else {
+      root.style.backgroundColor = "#fff";
+      root.style.colorScheme = "light";
+    }
   }, [theme]);
 
-  // This useEffect ensures the theme is applied immediately on component mount
   useEffect(() => {
-    // Apply theme on initial load
     const root = window.document.documentElement;
     const savedTheme = localStorage.getItem(storageKey) as Theme;
-    
     if (savedTheme) {
       root.classList.add(savedTheme);
     } else if (defaultTheme === "system") {
@@ -64,6 +62,14 @@ export function ThemeProvider({
       root.classList.add(systemTheme);
     } else {
       root.classList.add(defaultTheme);
+    }
+    // Set color scheme / background on load
+    if (savedTheme === "dark" || (savedTheme === undefined && defaultTheme === "dark")) {
+      root.style.backgroundColor = "#17172a";
+      root.style.colorScheme = "dark";
+    } else {
+      root.style.backgroundColor = "#fff";
+      root.style.colorScheme = "light";
     }
   }, []);
 
@@ -84,9 +90,6 @@ export function ThemeProvider({
 
 export const useTheme = () => {
   const context = useContext(ThemeProviderContext);
-
-  if (context === undefined)
-    throw new Error("useTheme must be used within a ThemeProvider");
-
+  if (context === undefined) throw new Error("useTheme must be used within a ThemeProvider");
   return context;
 };
