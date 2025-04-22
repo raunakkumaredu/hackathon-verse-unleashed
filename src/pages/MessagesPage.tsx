@@ -1,219 +1,356 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Search } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Send, Search, Plus } from "lucide-react";
+import { toast } from "sonner";
+
+interface Message {
+  id: string;
+  senderId: string;
+  senderName: string;
+  senderAvatar?: string;
+  content: string;
+  timestamp: Date;
+  read: boolean;
+}
+
+interface Conversation {
+  id: string;
+  participantId: string;
+  participantName: string;
+  participantAvatar?: string;
+  participantRole: string;
+  lastMessage?: string;
+  unreadCount: number;
+  messages: Message[];
+}
 
 const MessagesPage = () => {
   const { authState } = useAuth();
-  const userRole = authState.user?.role || "student";
+  const [currentMessage, setCurrentMessage] = useState("");
+  const [activeConversation, setActiveConversation] = useState<string | null>(null);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const conversations = [
-    {
-      id: 1,
-      name: "Team Alpha",
-      avatar: "",
-      lastMessage: "Let's meet tomorrow at 3 PM to discuss the project.",
-      time: "10:24 AM",
-      unread: true,
-      isGroup: true,
-    },
-    {
-      id: 2,
-      name: "Sarah Johnson",
-      avatar: "https://github.com/shadcn.png",
-      lastMessage: "I've pushed the latest changes to the repo.",
-      time: "Yesterday",
-      unread: false,
-      isGroup: false,
-    },
-    {
-      id: 3,
-      name: "Mentor Group",
-      avatar: "",
-      lastMessage: "Don't forget to submit your weekly progress report!",
-      time: "Yesterday",
-      unread: true,
-      isGroup: true,
-    },
-    {
-      id: 4,
-      name: "David Lee",
-      avatar: "https://github.com/shadcn.png",
-      lastMessage: "Can you help me with the backend integration?",
-      time: "Monday",
-      unread: false,
-      isGroup: false,
-    },
-    {
-      id: 5,
-      name: "Hackathon Organizers",
-      avatar: "",
-      lastMessage: "Important update regarding the submission deadline.",
-      time: "Last Week",
-      unread: false,
-      isGroup: true,
-    },
-  ];
+  // Mock data for conversations
+  useEffect(() => {
+    const mockConversations: Conversation[] = [
+      {
+        id: "1",
+        participantId: "user-1",
+        participantName: "Jane Smith",
+        participantAvatar: "https://github.com/shadcn.png",
+        participantRole: "mentor",
+        lastMessage: "Looking forward to your project submission!",
+        unreadCount: 2,
+        messages: [
+          {
+            id: "msg-1",
+            senderId: "user-1",
+            senderName: "Jane Smith",
+            senderAvatar: "https://github.com/shadcn.png",
+            content: "Hi there! How's your hackathon project coming along?",
+            timestamp: new Date(Date.now() - 86400000), // 1 day ago
+            read: true,
+          },
+          {
+            id: "msg-2",
+            senderId: authState.user?.id || "me",
+            senderName: "You",
+            content: "Making good progress! Just working on the final features.",
+            timestamp: new Date(Date.now() - 75600000), // ~21 hours ago
+            read: true,
+          },
+          {
+            id: "msg-3",
+            senderId: "user-1",
+            senderName: "Jane Smith",
+            senderAvatar: "https://github.com/shadcn.png",
+            content: "Looking forward to your project submission!",
+            timestamp: new Date(Date.now() - 3600000), // 1 hour ago
+            read: false,
+          },
+        ],
+      },
+      {
+        id: "2",
+        participantId: "user-2",
+        participantName: "John Doe",
+        participantRole: "student",
+        unreadCount: 0,
+        messages: [
+          {
+            id: "msg-4",
+            senderId: "user-2",
+            senderName: "John Doe",
+            content: "Would you be interested in joining our team for the AI challenge?",
+            timestamp: new Date(Date.now() - 172800000), // 2 days ago
+            read: true,
+          },
+          {
+            id: "msg-5",
+            senderId: authState.user?.id || "me",
+            senderName: "You",
+            content: "I might be! What technologies are you planning to use?",
+            timestamp: new Date(Date.now() - 172000000), // ~2 days ago
+            read: true,
+          },
+        ],
+      },
+      {
+        id: "3",
+        participantId: "user-3",
+        participantName: "TechCorp",
+        participantRole: "company",
+        unreadCount: 1,
+        messages: [
+          {
+            id: "msg-6",
+            senderId: "user-3",
+            senderName: "TechCorp",
+            content: "We're impressed with your profile and would like to discuss potential opportunities.",
+            timestamp: new Date(Date.now() - 259200000), // 3 days ago
+            read: false,
+          },
+        ],
+      },
+    ];
 
-  const currentConversation = {
-    id: 1,
-    name: "Team Alpha",
-    participants: ["You", "Alex", "Maria", "John"],
-    messages: [
-      {
-        id: 1,
-        sender: "Alex",
-        content: "Hey team! How's everyone doing with their tasks?",
-        time: "9:30 AM",
-        avatar: "https://github.com/shadcn.png",
-      },
-      {
-        id: 2,
-        sender: "Maria",
-        content: "I'm almost done with the UI design. Will share the Figma link today.",
-        time: "9:45 AM",
-        avatar: "https://github.com/shadcn.png",
-      },
-      {
-        id: 3,
-        sender: "John",
-        content: "Backend is coming along nicely. Need to fix a few bugs though.",
-        time: "10:00 AM",
-        avatar: "https://github.com/shadcn.png",
-      },
-      {
-        id: 4,
-        sender: "You",
-        content: "Great progress everyone! I've been working on the API integration.",
-        time: "10:15 AM",
-        avatar: authState.user?.avatar || "",
-        isCurrentUser: true,
-      },
-      {
-        id: 5,
-        sender: "Alex",
-        content: "Let's meet tomorrow at 3 PM to discuss the project.",
-        time: "10:24 AM",
-        avatar: "https://github.com/shadcn.png",
-      },
-    ],
+    setConversations(mockConversations);
+    if (mockConversations.length > 0) {
+      setActiveConversation(mockConversations[0].id);
+    }
+  }, [authState.user?.id]);
+
+  const handleSendMessage = () => {
+    if (!currentMessage.trim() || !activeConversation) return;
+
+    const newMessage: Message = {
+      id: `msg-${Date.now()}`,
+      senderId: authState.user?.id || "me",
+      senderName: "You",
+      content: currentMessage,
+      timestamp: new Date(),
+      read: true,
+    };
+
+    setConversations((prevConversations) =>
+      prevConversations.map((conversation) => {
+        if (conversation.id === activeConversation) {
+          return {
+            ...conversation,
+            lastMessage: currentMessage,
+            messages: [...conversation.messages, newMessage],
+          };
+        }
+        return conversation;
+      })
+    );
+
+    setCurrentMessage("");
+    toast.success("Message sent!");
   };
 
+  const filteredConversations = conversations.filter((conversation) =>
+    conversation.participantName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const formatTime = (date: Date) => {
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else if (diffDays === 1) {
+      return 'Yesterday';
+    } else if (diffDays < 7) {
+      return date.toLocaleDateString([], { weekday: 'short' });
+    } else {
+      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+  };
+
+  const activeConvo = conversations.find((c) => c.id === activeConversation);
+
   return (
-    <DashboardLayout title="Messages" subtitle="Chat with your team and mentors" userRole={userRole}>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[calc(100vh-220px)] min-h-[500px] animate-fade-in">
-        {/* Conversations List */}
-        <Card className="md:col-span-1 flex flex-col">
-          <div className="p-4 border-b flex items-center space-x-2">
-            <Search className="h-5 w-5 text-muted-foreground shrink-0" />
-            <Input placeholder="Search messages..." className="h-9" />
-          </div>
-          <ScrollArea className="flex-1">
-            <div className="divide-y">
-              {conversations.map((conversation) => (
-                <div 
-                  key={conversation.id} 
-                  className={`p-3 flex items-center space-x-3 hover:bg-muted/50 cursor-pointer transition-colors ${
-                    conversation.id === currentConversation.id ? "bg-muted" : ""
-                  } ${conversation.unread ? "font-medium" : ""}`}
-                >
-                  <Avatar className="h-10 w-10 animate-fade-in hover:scale-110 transition-transform">
-                    <AvatarImage src={conversation.avatar} />
-                    <AvatarFallback className={conversation.isGroup ? "bg-primary/20" : ""}>
-                      {conversation.isGroup ? conversation.name.substring(0, 2) : conversation.name.substring(0, 2)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-center">
-                      <p className="text-sm font-medium truncate">{conversation.name}</p>
-                      <p className="text-xs text-muted-foreground">{conversation.time}</p>
-                    </div>
-                    <p className="text-xs truncate text-muted-foreground">
-                      {conversation.lastMessage}
-                    </p>
-                  </div>
-                  {conversation.unread && (
-                    <div className="h-2 w-2 bg-primary rounded-full animate-pulse"></div>
-                  )}
-                </div>
-              ))}
+    <DashboardLayout
+      title="Messages"
+      subtitle="Connect with participants, mentors, and companies"
+      userRole={authState.user?.role || "student"}
+    >
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[calc(100vh-200px)] animate-fade-in">
+        <Card className="md:col-span-1 overflow-hidden">
+          <CardHeader className="px-4 py-3 space-y-2">
+            <CardTitle className="text-lg">Conversations</CardTitle>
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search messages..."
+                className="pl-8"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
-          </ScrollArea>
-        </Card>
-
-        {/* Chat Area */}
-        <Card className="md:col-span-2 flex flex-col">
-          <div className="p-4 border-b flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-primary/20">
-                  {currentConversation.name.substring(0, 2)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="text-sm font-medium">{currentConversation.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {currentConversation.participants.join(", ")}
-                </p>
-              </div>
-            </div>
-            <Button variant="outline" size="sm" className="hover:scale-105 transition-transform">
-              Info
-            </Button>
-          </div>
-
-          <ScrollArea className="flex-1 p-4">
-            <div className="space-y-4">
-              {currentConversation.messages.map((message) => (
-                <div 
-                  key={message.id} 
-                  className={`flex ${message.isCurrentUser ? "justify-end" : "justify-start"}`}
-                >
-                  <div className={`flex gap-2 max-w-[80%] ${message.isCurrentUser ? "flex-row-reverse" : ""}`}>
-                    <Avatar className="h-8 w-8 mt-1 flex-shrink-0 hover:scale-110 transition-transform">
-                      <AvatarImage src={message.avatar} />
+          </CardHeader>
+          <ScrollArea className="h-[calc(100vh-280px)]">
+            {filteredConversations.length > 0 ? (
+              filteredConversations.map((conversation) => (
+                <div key={conversation.id} className="cursor-pointer">
+                  <div
+                    className={`flex items-start gap-3 p-3 hover:bg-muted/50 transition-colors ${
+                      activeConversation === conversation.id ? "bg-muted" : ""
+                    }`}
+                    onClick={() => setActiveConversation(conversation.id)}
+                  >
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={conversation.participantAvatar} />
                       <AvatarFallback>
-                        {message.sender.substring(0, 2)}
+                        {conversation.participantName.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
-                    <div>
-                      <div className={`flex items-center gap-2 mb-1 ${message.isCurrentUser ? "justify-end" : ""}`}>
-                        <span className="text-sm font-medium">
-                          {message.sender}
-                        </span>
+                    <div className="flex-1 space-y-1 overflow-hidden">
+                      <div className="flex items-center justify-between">
+                        <p className="font-medium text-sm">
+                          {conversation.participantName}
+                        </p>
                         <span className="text-xs text-muted-foreground">
-                          {message.time}
+                          {conversation.messages.length > 0
+                            ? formatTime(conversation.messages[conversation.messages.length - 1].timestamp)
+                            : ""}
                         </span>
                       </div>
-                      <div 
-                        className={`rounded-lg p-3 ${
-                          message.isCurrentUser 
-                            ? "bg-primary text-primary-foreground" 
-                            : "bg-muted"
-                        }`}
-                      >
-                        <p className="text-sm">{message.content}</p>
-                      </div>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {conversation.lastMessage || "Start a conversation"}
+                      </p>
                     </div>
+                    {conversation.unreadCount > 0 && (
+                      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+                        {conversation.unreadCount}
+                      </div>
+                    )}
+                  </div>
+                  <Separator />
+                </div>
+              ))
+            ) : (
+              <div className="p-4 text-center text-muted-foreground">
+                No conversations found
+              </div>
+            )}
+          </ScrollArea>
+          <div className="p-3 border-t">
+            <Button variant="outline" size="sm" className="w-full">
+              <Plus className="h-4 w-4 mr-2" /> New Message
+            </Button>
+          </div>
+        </Card>
+
+        <Card className="md:col-span-2 flex flex-col">
+          {activeConvo ? (
+            <>
+              <CardHeader className="px-4 py-3 border-b">
+                <div className="flex items-center gap-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={activeConvo.participantAvatar} />
+                    <AvatarFallback>{activeConvo.participantName.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <CardTitle className="text-base">{activeConvo.participantName}</CardTitle>
+                    <p className="text-xs text-muted-foreground capitalize">
+                      {activeConvo.participantRole}
+                    </p>
                   </div>
                 </div>
-              ))}
+              </CardHeader>
+
+              <ScrollArea className="flex-1 p-4 h-[calc(100vh-340px)]">
+                <div className="space-y-4">
+                  {activeConvo.messages.map((message) => {
+                    const isOwnMessage = message.senderId === authState.user?.id || message.senderId === "me";
+
+                    return (
+                      <div
+                        key={message.id}
+                        className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`}
+                      >
+                        <div className="flex items-start gap-2 max-w-[80%]">
+                          {!isOwnMessage && (
+                            <Avatar className="h-8 w-8 mt-1">
+                              <AvatarImage src={message.senderAvatar} />
+                              <AvatarFallback>
+                                {message.senderName.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                          )}
+                          <div
+                            className={`rounded-lg p-3 ${
+                              isOwnMessage
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-muted"
+                            }`}
+                          >
+                            <p className="text-sm">{message.content}</p>
+                            <p
+                              className={`text-xs mt-1 ${
+                                isOwnMessage
+                                  ? "text-primary-foreground/70"
+                                  : "text-muted-foreground"
+                              }`}
+                            >
+                              {formatTime(message.timestamp)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </ScrollArea>
+
+              <div className="p-4 border-t mt-auto flex gap-2">
+                <Input
+                  placeholder="Type your message..."
+                  value={currentMessage}
+                  onChange={(e) => setCurrentMessage(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
+                  className="flex-1"
+                />
+                <Button
+                  onClick={handleSendMessage}
+                  disabled={!currentMessage.trim()}
+                  size="icon"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full p-4 text-center">
+              <div className="p-6 rounded-full bg-muted mb-4">
+                <Send className="h-6 w-6 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-medium mb-1">No conversation selected</h3>
+              <p className="text-muted-foreground mb-4">
+                Choose a conversation from the list or start a new one
+              </p>
+              <Button variant="outline" size="sm">
+                <Plus className="h-4 w-4 mr-2" /> New Message
+              </Button>
             </div>
-          </ScrollArea>
-          
-          <div className="p-4 border-t mt-auto">
-            <form className="flex space-x-2" onSubmit={(e) => e.preventDefault()}>
-              <Input placeholder="Type a message..." className="flex-1" />
-              <Button type="submit" className="hover:scale-105 transition-transform animate-fade-in">Send</Button>
-            </form>
-          </div>
+          )}
         </Card>
       </div>
     </DashboardLayout>

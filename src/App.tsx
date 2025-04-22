@@ -48,6 +48,14 @@ import ChallengeDetailPage from "./pages/ChallengeDetailPage";
 import TeamDetailPage from "./pages/TeamDetailPage";
 import MyTeamsPage from "./pages/MyTeamsPage";
 
+// New Feature Pages
+import JudgingSystemPage from "./pages/JudgingSystemPage";
+import SkillShowcasePage from "./pages/SkillShowcasePage";
+import TournamentPage from "./pages/TournamentPage";
+import InnovationChallengesPage from "./pages/InnovationChallengesPage";
+import SponsoredEventsPage from "./pages/SponsoredEventsPage";
+import TalentRecruitmentPage from "./pages/TalentRecruitmentPage";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -254,6 +262,43 @@ const App = () => (
                 <Route path="availability" element={
                   <ProtectedRoute allowedRoles={["mentor"]}>
                     <AvailabilityPage />
+                  </ProtectedRoute>
+                } />
+                
+                {/* New Feature Routes */}
+                <Route path="judging" element={
+                  <ProtectedRoute>
+                    <JudgingSystemPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="skills" element={
+                  <ProtectedRoute>
+                    <SkillShowcasePage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="tournaments" element={
+                  <ProtectedRoute>
+                    <TournamentPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="innovation-challenges" element={
+                  <ProtectedRoute>
+                    <InnovationChallengesPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="sponsored-events" element={
+                  <ProtectedRoute>
+                    <SponsoredEventsPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="talent-recruitment" element={
+                  <ProtectedRoute>
+                    <TalentRecruitmentPage />
                   </ProtectedRoute>
                 } />
                 
