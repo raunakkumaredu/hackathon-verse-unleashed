@@ -68,7 +68,6 @@ const AnalyticsPage = () => {
         </Select>
       </div>
       
-      {/* Overview Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <Card>
           <CardHeader className="pb-2">
@@ -127,7 +126,6 @@ const AnalyticsPage = () => {
           </TabsTrigger>
         </TabsList>
         
-        {/* Participation Tab */}
         <TabsContent value="participation">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
@@ -184,7 +182,6 @@ const AnalyticsPage = () => {
           </div>
         </TabsContent>
         
-        {/* Skills Tab */}
         <TabsContent value="skills">
           <Card>
             <CardHeader>
@@ -208,7 +205,6 @@ const AnalyticsPage = () => {
           </Card>
         </TabsContent>
         
-        {/* Demographics Tab */}
         <TabsContent value="demographics">
           <div className="text-center py-12">
             <CircleDot className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
@@ -219,7 +215,6 @@ const AnalyticsPage = () => {
           </div>
         </TabsContent>
         
-        {/* Performance Tab */}
         <TabsContent value="performance">
           <Card>
             <CardHeader>
@@ -244,7 +239,6 @@ const AnalyticsPage = () => {
         </TabsContent>
       </Tabs>
       
-      {/* Personal Progress Section */}
       <div className="mt-8">
         <h2 className="text-2xl font-semibold mb-6">Your Progress</h2>
         
