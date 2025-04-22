@@ -1,11 +1,10 @@
-
 import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BarChart as BarChartIcon, LineChart, PieChart, BubbleChart, BarChartHorizontal } from "lucide-react";
+import { BarChart as BarChartIcon, LineChart, PieChart, CircleDot, BarChartHorizontal } from "lucide-react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart as RechartsLineChart, Line, PieChart as RechartsPieChart, Pie, Cell } from 'recharts';
 
 const AnalyticsPage = () => {
@@ -212,7 +211,7 @@ const AnalyticsPage = () => {
         {/* Demographics Tab */}
         <TabsContent value="demographics">
           <div className="text-center py-12">
-            <BubbleChart className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+            <CircleDot className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
             <h3 className="text-xl font-semibold">Demographics Analysis Coming Soon</h3>
             <p className="text-muted-foreground max-w-md mx-auto mt-2">
               We're collecting more data to provide detailed demographics insights for our hackathon community.
@@ -273,7 +272,7 @@ const AnalyticsPage = () => {
             </CardHeader>
             <CardContent>
               <div className="text-center py-12">
-                <BubbleChart className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                <CircleDot className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
                 <h3 className="text-lg font-semibold">Achievement Timeline Coming Soon</h3>
                 <p className="text-muted-foreground max-w-md mx-auto mt-2">
                   Your hackathon milestones will appear here as you participate in more events.
