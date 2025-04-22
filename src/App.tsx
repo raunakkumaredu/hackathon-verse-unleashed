@@ -3,15 +3,35 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { AuthProvider } from "@/contexts/AuthContext"; 
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Landing from "./pages/Landing";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { RegisterForm } from "@/components/auth/RegisterForm";
 import StudentDashboard from "./pages/StudentDashboard";
 import NotFound from "./pages/NotFound";
+
+// Dashboard placeholders until we create proper components
+import CompanyDashboard from "./pages/CompanyDashboard";
+import CollegeDashboard from "./pages/CollegeDashboard";
+import MentorDashboard from "./pages/MentorDashboard";
+
+// Feature Pages
+import ProfilePage from "./pages/ProfilePage";
+import ChallengesPage from "./pages/ChallengesPage";
+import TeamsPage from "./pages/TeamsPage";
+import ResourcesPage from "./pages/ResourcesPage";
+import LeaderboardPage from "./pages/LeaderboardPage";
+import CollaborationPage from "./pages/CollaborationPage";
+import ProjectSubmissionPage from "./pages/ProjectSubmissionPage";
+import NetworkingPage from "./pages/NetworkingPage";
+import AnalyticsPage from "./pages/AnalyticsPage";
+import EventTimelinePage from "./pages/EventTimelinePage";
+import FeedbackPage from "./pages/FeedbackPage";
+import MentorshipPage from "./pages/MentorshipPage";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +46,8 @@ const App = () => (
             <Routes>
               <Route path="/" element={<MainLayout />}>
                 <Route index element={<Landing />} />
+                
+                {/* Auth Routes */}
                 <Route path="login" element={
                   <div className="container mx-auto py-20 px-4">
                     <LoginForm />
@@ -36,18 +58,109 @@ const App = () => (
                     <RegisterForm />
                   </div>
                 } />
-                {/* Dashboard routes - these would be protected in a real app */}
-                <Route path="student-dashboard" element={<StudentDashboard />} />
-                <Route path="company-dashboard" element={<div className="container mx-auto py-20 px-4"><h1 className="text-3xl font-bold gradient-text">Company Dashboard</h1></div>} />
-                <Route path="college-dashboard" element={<div className="container mx-auto py-20 px-4"><h1 className="text-3xl font-bold gradient-text">College Dashboard</h1></div>} />
-                <Route path="mentor-dashboard" element={<div className="container mx-auto py-20 px-4"><h1 className="text-3xl font-bold gradient-text">Mentor Dashboard</h1></div>} />
                 
-                {/* Additional routes */}
-                <Route path="challenges" element={<div className="container mx-auto py-20 px-4"><h1 className="text-3xl font-bold gradient-text">Challenges</h1></div>} />
-                <Route path="teams" element={<div className="container mx-auto py-20 px-4"><h1 className="text-3xl font-bold gradient-text">Teams</h1></div>} />
-                <Route path="resources" element={<div className="container mx-auto py-20 px-4"><h1 className="text-3xl font-bold gradient-text">Resources</h1></div>} />
-                <Route path="leaderboard" element={<div className="container mx-auto py-20 px-4"><h1 className="text-3xl font-bold gradient-text">Leaderboard</h1></div>} />
+                {/* Protected Dashboard Routes */}
+                <Route path="student-dashboard" element={
+                  <ProtectedRoute allowedRoles={["student"]}>
+                    <StudentDashboard />
+                  </ProtectedRoute>
+                } />
                 
+                <Route path="company-dashboard" element={
+                  <ProtectedRoute allowedRoles={["company"]}>
+                    <CompanyDashboard />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="college-dashboard" element={
+                  <ProtectedRoute allowedRoles={["college"]}>
+                    <CollegeDashboard />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="mentor-dashboard" element={
+                  <ProtectedRoute allowedRoles={["mentor"]}>
+                    <MentorDashboard />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Feature Routes */}
+                <Route path="profile" element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="challenges" element={
+                  <ProtectedRoute>
+                    <ChallengesPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="teams" element={
+                  <ProtectedRoute>
+                    <TeamsPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="resources" element={
+                  <ProtectedRoute>
+                    <ResourcesPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="leaderboard" element={
+                  <ProtectedRoute>
+                    <LeaderboardPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="collaboration" element={
+                  <ProtectedRoute>
+                    <CollaborationPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="project-submission" element={
+                  <ProtectedRoute>
+                    <ProjectSubmissionPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="networking" element={
+                  <ProtectedRoute>
+                    <NetworkingPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="analytics" element={
+                  <ProtectedRoute>
+                    <AnalyticsPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="timeline" element={
+                  <ProtectedRoute>
+                    <EventTimelinePage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="feedback" element={
+                  <ProtectedRoute>
+                    <FeedbackPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="mentorship" element={
+                  <ProtectedRoute>
+                    <MentorshipPage />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Redirections */}
+                <Route path="dashboard" element={<Navigate to="/student-dashboard" replace />} />
+                
+                {/* 404 Route */}
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>
