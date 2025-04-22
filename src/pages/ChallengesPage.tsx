@@ -1,6 +1,5 @@
-
 import React, { useState } from "react";
-import { Search, Filter, Trophy, Clock, Users, Calendar, ChevronDown } from "lucide-react";
+import { Search, Filter, Trophy, Clock, Users, Calendar, ChevronDown, Plus } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -11,7 +10,6 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-// Mock hackathon data
 const hackathonData = [
   {
     id: "1",
@@ -96,8 +94,9 @@ const ChallengesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterDifficulty, setFilterDifficulty] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+  const userRole = authState.user?.role || "student";
+  const canCreateChallenges = userRole === "company" || userRole === "college";
   
-  // Filter hackathons based on search query and filters
   const filteredHackathons = hackathonData.filter(hackathon => {
     const matchesSearch = 
       hackathon.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -114,9 +113,20 @@ const ChallengesPage = () => {
     <DashboardLayout
       title="Challenges & Hackathons"
       subtitle="Discover upcoming hackathons and challenges"
-      userRole={authState.user?.role}
+      userRole={userRole}
     >
-      {/* Filters and Search */}
+      {canCreateChallenges && (
+        <div className="mb-6">
+          <Button 
+            onClick={() => navigate("/challenges/create")} 
+            className="bg-gradient-to-r from-hackathon-purple to-hackathon-blue text-white hover:from-hackathon-purple/90 hover:to-hackathon-blue/90 animate-pulse-gentle hover:animate-none"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create New Challenge
+          </Button>
+        </div>
+      )}
+      
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -161,7 +171,6 @@ const ChallengesPage = () => {
         </div>
       </div>
       
-      {/* Challenge Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredHackathons.map(hackathon => (
           <Card key={hackathon.id} className="glass-card hover:shadow-lg transition-shadow">
@@ -240,7 +249,6 @@ const ChallengesPage = () => {
         </div>
       )}
       
-      {/* Featured Challenge */}
       <div className="mt-8">
         <h2 className="text-2xl font-bold mb-6 flex items-center">
           <Trophy className="h-6 w-6 mr-2 text-primary" />
@@ -303,14 +311,14 @@ const ChallengesPage = () => {
         </Card>
       </div>
       
-      {/* Create Challenge Button (for companies/colleges) */}
-      {(authState.user?.role === "company" || authState.user?.role === "college") && (
+      {canCreateChallenges && (
         <div className="mt-8 flex justify-end">
           <Button 
             size="lg"
-            className="animate-pulse"
+            className="animate-pulse-gentle"
             onClick={() => navigate("/challenges/create")}
           >
+            <Plus className="h-4 w-4 mr-2" />
             Create New Challenge
           </Button>
         </div>

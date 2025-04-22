@@ -2,14 +2,17 @@
 import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { Calendar, Bell } from "lucide-react";
+import { Calendar, Bell, Plus } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
 
 const EventsPage = () => {
   const { authState } = useAuth();
   const userRole = authState.user?.role || "student";
+  const canCreateEvents = userRole === "company" || userRole === "college";
+  const navigate = useNavigate();
 
   const upcomingEvents = [
     {
@@ -73,10 +76,21 @@ const EventsPage = () => {
             <Calendar className="h-5 w-5 animate-pulse text-primary" />
             <h2 className="text-xl font-semibold">Upcoming Events</h2>
           </div>
-          <Button className="hover:scale-105 transition-transform animate-fade-in">
-            <Bell className="mr-2 h-4 w-4" />
-            Subscribe to Calendar
-          </Button>
+          <div className="flex gap-2">
+            {canCreateEvents && (
+              <Button 
+                className="hover:scale-105 transition-transform animate-fade-in"
+                onClick={() => navigate("/challenges/create")}
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Create Event
+              </Button>
+            )}
+            <Button variant="outline" className="hover:scale-105 transition-transform animate-fade-in">
+              <Bell className="mr-2 h-4 w-4" />
+              Subscribe to Calendar
+            </Button>
+          </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
@@ -112,6 +126,27 @@ const EventsPage = () => {
             <p className="text-center text-muted-foreground">Full calendar view coming soon...</p>
           </Card>
         </div>
+        
+        {/* Call to action for companies and colleges */}
+        {canCreateEvents && (
+          <div className="mt-8 flex justify-center">
+            <Card className="w-full max-w-2xl bg-gradient-to-r from-hackathon-purple/20 to-hackathon-blue/20 border-hackathon-purple/30">
+              <CardContent className="pt-6 pb-6 flex flex-col items-center text-center">
+                <h3 className="text-xl font-semibold mb-2">Host Your Own Event</h3>
+                <p className="text-muted-foreground mb-4">
+                  Create and manage hackathons, workshops, networking sessions and more.
+                </p>
+                <Button 
+                  onClick={() => navigate("/challenges/create")}
+                  className="bg-gradient-to-r from-hackathon-purple to-hackathon-blue text-white"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create New Event
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );

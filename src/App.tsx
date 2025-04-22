@@ -22,6 +22,7 @@ import MentorDashboard from "./pages/MentorDashboard";
 // Feature Pages
 import ProfilePage from "./pages/ProfilePage";
 import ChallengesPage from "./pages/ChallengesPage";
+import CreateChallengePage from "./pages/CreateChallengePage";
 import TeamsPage from "./pages/TeamsPage";
 import ResourcesPage from "./pages/ResourcesPage";
 import LeaderboardPage from "./pages/LeaderboardPage";
@@ -105,6 +106,13 @@ const App = () => (
                 <Route path="challenges" element={
                   <ProtectedRoute>
                     <ChallengesPage />
+                  </ProtectedRoute>
+                } />
+                
+                {/* New Route for Creating Challenges */}
+                <Route path="challenges/create" element={
+                  <ProtectedRoute allowedRoles={["company", "college"]}>
+                    <CreateChallengePage />
                   </ProtectedRoute>
                 } />
                 
