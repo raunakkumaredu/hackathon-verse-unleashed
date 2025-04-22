@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -13,13 +14,13 @@ const ResourcesPage = () => {
   const { authState } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   
-  // Mock resource data
+  // Mock resource data (with smaller Unsplash images)
   const resources = [
     {
       id: "1",
       title: "Getting Started with React",
       type: "tutorial",
-      thumbnail: "https://placehold.co/400x200",
+      thumbnail: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=320&h=160&fit=crop",
       description: "Learn the basics of React and build your first component",
       author: "TechCorp Academy",
       tags: ["React", "Frontend", "JavaScript"],
@@ -31,7 +32,7 @@ const ResourcesPage = () => {
       id: "2",
       title: "Machine Learning Fundamentals",
       type: "course",
-      thumbnail: "https://placehold.co/400x200",
+      thumbnail: "https://images.unsplash.com/photo-1488972685288-c3fd157d7c7a?w=320&h=160&fit=crop",
       description: "An introduction to machine learning concepts and algorithms",
       author: "AI Research Institute",
       tags: ["AI", "Machine Learning", "Python"],
@@ -43,7 +44,7 @@ const ResourcesPage = () => {
       id: "3",
       title: "Building RESTful APIs",
       type: "documentation",
-      thumbnail: "https://placehold.co/400x200",
+      thumbnail: "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?w=320&h=160&fit=crop",
       description: "Best practices for designing and building RESTful APIs",
       author: "API Standards Group",
       tags: ["API", "Backend", "REST"],
@@ -54,7 +55,7 @@ const ResourcesPage = () => {
       id: "4",
       title: "Introduction to Blockchain Technology",
       type: "video",
-      thumbnail: "https://placehold.co/400x200",
+      thumbnail: "https://images.unsplash.com/photo-1460574283810-2aab119d8511?w=320&h=160&fit=crop",
       description: "Understanding blockchain fundamentals and applications",
       author: "Blockchain Education Network",
       tags: ["Blockchain", "Web3", "Crypto"],
@@ -120,8 +121,9 @@ const ResourcesPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredResources.map(resource => (
                 <Card key={resource.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="aspect-video relative bg-muted">
-                    <img src={resource.thumbnail} alt={resource.title} className="object-cover w-full h-full" />
+                  {/* Add animated float effect to images */}
+                  <div className="aspect-video relative bg-muted animate-float">
+                    <img src={resource.thumbnail} alt={resource.title} className="object-cover w-full h-full rounded-t-md" />
                     <div className="absolute top-2 right-2">
                       <Badge variant="secondary" className="bg-black/70 text-white">
                         {resource.type}
@@ -277,3 +279,4 @@ const ResourcesPage = () => {
 };
 
 export default ResourcesPage;
+
