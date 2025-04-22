@@ -33,6 +33,13 @@ import EventTimelinePage from "./pages/EventTimelinePage";
 import FeedbackPage from "./pages/FeedbackPage";
 import MentorshipPage from "./pages/MentorshipPage";
 
+// New Pages
+import EventsPage from "./pages/EventsPage";
+import SettingsPage from "./pages/SettingsPage";
+import ProgressPage from "./pages/ProgressPage";
+import MessagesPage from "./pages/MessagesPage";
+import SupportPage from "./pages/SupportPage";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -154,6 +161,37 @@ const App = () => (
                 <Route path="mentorship" element={
                   <ProtectedRoute>
                     <MentorshipPage />
+                  </ProtectedRoute>
+                } />
+                
+                {/* New Routes */}
+                <Route path="events" element={
+                  <ProtectedRoute>
+                    <EventsPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="settings" element={
+                  <ProtectedRoute>
+                    <SettingsPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="progress" element={
+                  <ProtectedRoute>
+                    <ProgressPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="messages" element={
+                  <ProtectedRoute>
+                    <MessagesPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="support" element={
+                  <ProtectedRoute>
+                    <SupportPage />
                   </ProtectedRoute>
                 } />
                 
