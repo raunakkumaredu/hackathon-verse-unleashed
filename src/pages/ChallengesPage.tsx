@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { Search, Filter, Trophy, Clock, Users, Calendar, ChevronDown, Plus } from "lucide-react";
+
+import React, { useState, useEffect } from "react";
+import { Search, Filter, Trophy, Clock, Users, Plus } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -9,84 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-
-const hackathonData = [
-  {
-    id: "1",
-    title: "AI Innovation Challenge",
-    description: "Build the next generation of AI tools that solve real-world problems",
-    company: "TechCorp",
-    logo: "https://ui-avatars.com/api/?name=TC&background=random",
-    startDate: "May 15, 2025",
-    endDate: "May 17, 2025",
-    status: "Upcoming",
-    participants: 45,
-    registrationOpen: true,
-    prizePool: "$5,000",
-    tags: ["AI", "Machine Learning", "Innovation"],
-    difficulty: "Intermediate",
-  },
-  {
-    id: "2",
-    title: "Blockchain Revolution Hackathon",
-    description: "Create decentralized applications that leverage blockchain technology",
-    company: "CryptoInc",
-    logo: "https://ui-avatars.com/api/?name=CI&background=random",
-    startDate: "Jun 20, 2025",
-    endDate: "Jun 22, 2025",
-    status: "Upcoming",
-    participants: 32,
-    registrationOpen: true,
-    prizePool: "$3,500",
-    tags: ["Blockchain", "Web3", "Crypto"],
-    difficulty: "Advanced",
-  },
-  {
-    id: "3",
-    title: "IoT Smart City Challenge",
-    description: "Design IoT solutions to make cities smarter and more efficient",
-    company: "ConnectTech",
-    logo: "https://ui-avatars.com/api/?name=CT&background=random",
-    startDate: "Jul 5, 2025",
-    endDate: "Jul 7, 2025",
-    status: "Upcoming",
-    participants: 28,
-    registrationOpen: true,
-    prizePool: "$4,000",
-    tags: ["IoT", "Smart Cities", "Hardware"],
-    difficulty: "Intermediate",
-  },
-  {
-    id: "4",
-    title: "Sustainability Hackathon",
-    description: "Create innovative solutions to environmental challenges",
-    company: "GreenTech",
-    logo: "https://ui-avatars.com/api/?name=GT&background=random",
-    startDate: "Aug 10, 2025",
-    endDate: "Aug 12, 2025",
-    status: "Upcoming",
-    participants: 21,
-    registrationOpen: true,
-    prizePool: "$3,000",
-    tags: ["Sustainability", "CleanTech", "Environment"],
-    difficulty: "Beginner",
-  },
-  {
-    id: "5",
-    title: "Web3 Development Challenge",
-    description: "Build the next generation of decentralized web applications",
-    company: "DecentralCorp",
-    logo: "https://ui-avatars.com/api/?name=DC&background=random",
-    startDate: "Aug 25, 2025",
-    endDate: "Aug 27, 2025",
-    status: "Upcoming",
-    participants: 15,
-    registrationOpen: true,
-    prizePool: "$4,500",
-    tags: ["Web3", "dApps", "Ethereum"],
-    difficulty: "Advanced",
-  }
-];
+import { HackathonCard } from "@/components/hackathon/HackathonCard";
+import { fetchAllHackathons, HackathonWithParticipation } from "@/services/hackathonService";
+import { MessageModal } from "@/components/ui/MessageModal";
+import { toast } from "sonner";
 
 const ChallengesPage = () => {
   const { authState } = useAuth();
@@ -94,10 +21,34 @@ const ChallengesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterDifficulty, setFilterDifficulty] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [hackathons, setHackathons] = useState<HackathonWithParticipation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  
   const userRole = authState.user?.role || "student";
   const canCreateChallenges = userRole === "company" || userRole === "college";
   
-  const filteredHackathons = hackathonData.filter(hackathon => {
+  useEffect(() => {
+    const loadHackathons = async () => {
+      setIsLoading(true);
+      try {
+        const data = await fetchAllHackathons(authState.user?.id);
+        setHackathons(data);
+        setError(null);
+      } catch (err) {
+        console.error("Error loading hackathons:", err);
+        setError("Failed to load hackathons. Please try again later.");
+        toast.error("Failed to load hackathons");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadHackathons();
+  }, [authState.user?.id]);
+  
+  const filteredHackathons = hackathons.filter(hackathon => {
     const matchesSearch = 
       hackathon.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       hackathon.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -109,12 +60,27 @@ const ChallengesPage = () => {
     return matchesSearch && matchesDifficulty && matchesStatus;
   });
 
+  const handleDeleteHackathon = () => {
+    // Refresh hackathons after deletion
+    fetchAllHackathons(authState.user?.id).then(data => {
+      setHackathons(data);
+      setShowSuccessMessage(true);
+      setTimeout(() => setShowSuccessMessage(false), 3000);
+    });
+  };
+
   return (
     <DashboardLayout
       title="Challenges & Hackathons"
       subtitle="Discover upcoming hackathons and challenges"
       userRole={userRole}
     >
+      <MessageModal
+        open={showSuccessMessage}
+        onClose={() => setShowSuccessMessage(false)}
+        title="Success"
+      />
+      
       {canCreateChallenges && (
         <div className="mb-6">
           <Button 
@@ -170,76 +136,36 @@ const ChallengesPage = () => {
           </Select>
         </div>
       </div>
+
+      {isLoading ? (
+        <div className="flex justify-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      ) : error ? (
+        <div className="text-center py-20">
+          <p className="text-red-500">{error}</p>
+          <Button 
+            variant="outline" 
+            className="mt-4" 
+            onClick={() => fetchAllHackathons(authState.user?.id).then(setHackathons)}
+          >
+            Try Again
+          </Button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredHackathons.map(hackathon => (
+            <HackathonCard 
+              key={hackathon.id} 
+              hackathon={hackathon}
+              onDelete={handleDeleteHackathon}
+              showDeleteButton={canCreateChallenges && hackathon.organizerId === authState.user?.id}
+            />
+          ))}
+        </div>
+      )}
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredHackathons.map(hackathon => (
-          <Card key={hackathon.id} className="glass-card hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between mb-2">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={hackathon.logo} />
-                  <AvatarFallback>{hackathon.company.substring(0, 2)}</AvatarFallback>
-                </Avatar>
-                <Badge 
-                  variant={hackathon.status === "Active" ? "default" : 
-                           hackathon.status === "Completed" ? "secondary" : "outline"}
-                >
-                  {hackathon.status}
-                </Badge>
-              </div>
-              <CardTitle className="text-lg">{hackathon.title}</CardTitle>
-              <CardDescription className="flex items-center">
-                By {hackathon.company}
-              </CardDescription>
-            </CardHeader>
-            
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                {hackathon.description}
-              </p>
-              
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center">
-                  <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <span>{hackathon.startDate}</span>
-                </div>
-                <div className="flex items-center">
-                  <Users className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <span>{hackathon.participants} participants</span>
-                </div>
-                <div className="flex items-center">
-                  <Trophy className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <span>{hackathon.prizePool}</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="rounded-full bg-primary/10 px-2 py-1 text-xs">
-                    {hackathon.difficulty}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap gap-1 pt-2">
-                {hackathon.tags.map(tag => (
-                  <Badge key={tag} variant="secondary" className="bg-primary/10 hover:bg-primary/20">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            </CardContent>
-            
-            <CardFooter>
-              <Button 
-                className="w-full" 
-                onClick={() => navigate(`/challenges/${hackathon.id}`)}
-              >
-                {hackathon.registrationOpen ? "Register Now" : "View Details"}
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
-      
-      {filteredHackathons.length === 0 && (
+      {!isLoading && !error && filteredHackathons.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20">
           <Trophy className="h-16 w-16 text-muted-foreground mb-4" />
           <h3 className="text-xl font-semibold mb-2">No challenges found</h3>

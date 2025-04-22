@@ -1,488 +1,523 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Trophy, Users, Calendar as CalendarIcon, Clock, Download, Share2, ArrowLeft } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Calendar, Clock, Trophy, Users, ArrowLeft } from "lucide-react";
+import { HackathonWithParticipation, joinHackathon } from "@/services/hackathonService";
+import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-// Mock data for challenge details
-const challengeData = {
-  "1": {
-    id: "1",
-    title: "AI Innovation Challenge",
-    description: "Build the next generation of AI tools that solve real-world problems. In this exciting hackathon, participants will work to create innovative solutions leveraging artificial intelligence and machine learning technologies to address real-world challenges across industries such as healthcare, education, environment, and more.",
-    longDescription: "This challenge is designed to foster innovation in the field of artificial intelligence. Participants will have the opportunity to demonstrate their skills and creativity by building applications that harness the power of AI to solve pressing problems. We encourage solutions that are not only technically sound but also practically applicable and scalable. Successful projects will show a deep understanding of both the technical aspects of AI and the real-world context of the problem being solved.",
-    company: "TechCorp",
-    logo: "https://ui-avatars.com/api/?name=TC&background=random",
-    startDate: "May 15, 2025",
-    endDate: "May 17, 2025",
-    location: "Online + San Francisco, CA",
-    registrationDeadline: "May 10, 2025",
-    status: "Upcoming",
-    participants: 45,
-    maxTeamSize: 4,
-    registrationOpen: true,
-    prizePool: "$5,000",
-    tags: ["AI", "Machine Learning", "Innovation"],
-    difficulty: "Intermediate",
-    timeline: [
-      { date: "May 1, 2025", event: "Registration Opens" },
-      { date: "May 10, 2025", event: "Registration Closes" },
-      { date: "May 12, 2025", event: "Teams Announcement" },
-      { date: "May 15, 2025", event: "Kickoff Event" },
-      { date: "May 17, 2025", event: "Submission Deadline" },
-      { date: "May 20, 2025", event: "Winners Announcement" }
-    ],
-    prizes: [
-      { position: "1st Place", prize: "$3,000 + Mentorship Opportunity" },
-      { position: "2nd Place", prize: "$1,500 + Cloud Credits" },
-      { position: "3rd Place", prize: "$500 + Software Licenses" }
-    ],
-    judges: [
-      { name: "Dr. Sarah Chen", role: "AI Research Lead", company: "TechCorp" },
-      { name: "Mike Johnson", role: "CTO", company: "AI Ventures" },
-      { name: "Priya Patel", role: "Product Director", company: "InnovateTech" }
-    ],
-    rules: [
-      "All code must be original or properly attributed",
-      "Teams must consist of 1-4 members",
-      "Submissions must include source code and documentation",
-      "Projects must address one of the provided challenge areas",
-      "Final presentations should be no longer than 5 minutes"
-    ],
-    resources: [
-      { name: "Starter Kit", url: "#", type: "GitHub Repository" },
-      { name: "API Documentation", url: "#", type: "Documentation" },
-      { name: "Workshop Recordings", url: "#", type: "Video" }
-    ]
-  },
-  "2": {
-    id: "2",
-    title: "Blockchain Revolution Hackathon",
-    description: "Create decentralized applications that leverage blockchain technology",
-    longDescription: "Dive into the world of blockchain and create innovative solutions that could revolutionize industries. This hackathon focuses on developing decentralized applications that utilize blockchain technology to solve problems related to transparency, security, and trust.",
-    company: "CryptoInc",
-    logo: "https://ui-avatars.com/api/?name=CI&background=random",
-    startDate: "Jun 20, 2025",
-    endDate: "Jun 22, 2025",
-    location: "Hybrid - New York & Virtual",
-    registrationDeadline: "Jun 15, 2025",
-    status: "Upcoming",
-    participants: 32,
-    maxTeamSize: 3,
-    registrationOpen: true,
-    prizePool: "$3,500",
-    tags: ["Blockchain", "Web3", "Crypto"],
-    difficulty: "Advanced",
-    timeline: [
-      { date: "Jun 1, 2025", event: "Registration Opens" },
-      { date: "Jun 15, 2025", event: "Registration Closes" },
-      { date: "Jun 20, 2025", event: "Hackathon Begins" },
-      { date: "Jun 22, 2025", event: "Submissions Due" },
-      { date: "Jun 25, 2025", event: "Winners Announced" }
-    ],
-    prizes: [
-      { position: "1st Place", prize: "$2,000 + Incubation Opportunity" },
-      { position: "2nd Place", prize: "$1,000 + Crypto Tokens" },
-      { position: "3rd Place", prize: "$500 + Development Resources" }
-    ],
-    judges: [
-      { name: "Alex Wu", role: "Blockchain Developer", company: "CryptoInc" },
-      { name: "Lisa Thompson", role: "Investment Director", company: "Web3 Capital" }
-    ],
-    rules: [
-      "All projects must utilize blockchain technology",
-      "Teams must consist of 1-3 members",
-      "All code must be open source",
-      "Solutions must address real-world problems"
-    ],
-    resources: [
-      { name: "Blockchain Framework", url: "#", type: "Development Kit" },
-      { name: "Smart Contract Templates", url: "#", type: "Code Samples" }
-    ]
-  },
-  // Add more challenges as needed with the same structure
-};
 
 const ChallengeDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { authState } = useAuth();
-  const userRole = authState.user?.role || "student";
-  const [registrationDialogOpen, setRegistrationDialogOpen] = useState(false);
-  const [selectedTeam, setSelectedTeam] = useState("");
+  const [hackathon, setHackathon] = useState<HackathonWithParticipation | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [registering, setRegistering] = useState(false);
+  
+  useEffect(() => {
+    const fetchHackathonDetails = async () => {
+      if (!id) return;
+      
+      setIsLoading(true);
+      try {
+        // Fetch the hackathon details
+        const { data, error } = await supabase
+          .from('hackathons')
+          .select('*')
+          .eq('id', id)
+          .single();
+          
+        if (error) throw error;
+        if (!data) {
+          setError("Hackathon not found");
+          return;
+        }
+        
+        // Check if user is participating
+        let participationStatus = null;
+        if (authState.user?.id) {
+          const { data: participation } = await supabase
+            .from('hackathon_participants')
+            .select('status')
+            .eq('hackathon_id', id)
+            .eq('user_id', authState.user.id)
+            .single();
+            
+          if (participation) {
+            participationStatus = participation.status;
+          }
+        }
+        
+        setHackathon({
+          id: data.id,
+          title: data.title,
+          description: data.description,
+          company: data.company,
+          logo: data.logo,
+          startDate: data.start_date,
+          endDate: data.end_date,
+          status: data.status,
+          participants: data.participants,
+          registrationOpen: data.registration_open,
+          prizePool: data.prize_pool,
+          tags: data.tags,
+          difficulty: data.difficulty,
+          organizerId: data.organizer_id,
+          createdAt: data.created_at,
+          participationStatus: participationStatus as "Registered" | "Interested" | undefined
+        });
+      } catch (err) {
+        console.error("Error fetching hackathon:", err);
+        setError("Failed to load hackathon details");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchHackathonDetails();
+  }, [id, authState.user?.id]);
 
-  // Mock teams for current user
-  const userTeams = [
-    { id: "team1", name: "Code Wizards" },
-    { id: "team2", name: "Tech Titans" },
-    { id: "team3", name: "New Team" },
-  ];
-
-  const challenge = id ? challengeData[id] : null;
-
-  if (!challenge) {
+  const handleRegister = async () => {
+    if (!authState.user) {
+      toast.error("Please login to register for this hackathon");
+      navigate("/login");
+      return;
+    }
+    
+    if (!hackathon) return;
+    
+    setRegistering(true);
+    try {
+      const success = await joinHackathon(hackathon.id, authState.user.id, "Registered");
+      if (success) {
+        setHackathon({
+          ...hackathon,
+          participationStatus: "Registered",
+          participants: hackathon.participants + 1
+        });
+      }
+    } finally {
+      setRegistering(false);
+    }
+  };
+  
+  const handleMarkInterested = async () => {
+    if (!authState.user) {
+      toast.error("Please login to mark interest in this hackathon");
+      navigate("/login");
+      return;
+    }
+    
+    if (!hackathon) return;
+    
+    setRegistering(true);
+    try {
+      const success = await joinHackathon(hackathon.id, authState.user.id, "Interested");
+      if (success) {
+        setHackathon({
+          ...hackathon,
+          participationStatus: "Interested"
+        });
+      }
+    } finally {
+      setRegistering(false);
+    }
+  };
+  
+  if (isLoading) {
     return (
-      <DashboardLayout
-        title="Challenge Details"
-        subtitle="View hackathon details"
-        userRole={userRole}
+      <DashboardLayout 
+        title="Loading Challenge" 
+        subtitle="Please wait..." 
+        userRole={authState.user?.role}
       >
-        <div className="flex flex-col items-center justify-center py-20">
-          <h2 className="text-2xl font-bold mb-4">Challenge not found</h2>
-          <p className="text-muted-foreground mb-6">
-            The challenge you're looking for doesn't exist or has been removed.
-          </p>
-          <Button onClick={() => navigate("/challenges")}>
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Challenges
-          </Button>
+        <div className="flex justify-center items-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
       </DashboardLayout>
     );
   }
-
-  const handleRegister = () => {
-    if (!selectedTeam) {
-      toast.error("Please select a team to register");
-      return;
-    }
-    
-    toast.success(`Successfully registered ${selectedTeam} for ${challenge.title}`);
-    setRegistrationDialogOpen(false);
-  };
-
-  const handleAddToCalendar = () => {
-    // In a real app, this would generate and download an .ics file
-    const icsData = generateICSFile(challenge);
-    downloadICSFile(icsData, `${challenge.title.replace(/\s+/g, '-').toLowerCase()}.ics`);
-    
-    toast.success("Event added to your calendar");
-  };
-
-  // Function to generate ICS file content
-  const generateICSFile = (challenge) => {
-    const startDate = new Date(challenge.startDate);
-    const endDate = new Date(challenge.endDate);
-    
-    return `BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-BEGIN:VEVENT
-SUMMARY:${challenge.title}
-DESCRIPTION:${challenge.description}
-LOCATION:${challenge.location}
-DTSTART:${formatDateForICS(startDate)}
-DTEND:${formatDateForICS(endDate)}
-STATUS:CONFIRMED
-SEQUENCE:0
-END:VEVENT
-END:VCALENDAR`;
-  };
-
-  // Format date for ICS file
-  const formatDateForICS = (date) => {
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    return `${year}${month}${day}T000000Z`;
-  };
-
-  // Download ICS file
-  const downloadICSFile = (content, filename) => {
-    const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
+  
+  if (error || !hackathon) {
+    return (
+      <DashboardLayout 
+        title="Challenge Not Found" 
+        subtitle="The challenge you're looking for doesn't exist" 
+        userRole={authState.user?.role}
+      >
+        <Alert variant="destructive" className="my-8">
+          <AlertDescription>{error || "Hackathon not found"}</AlertDescription>
+        </Alert>
+        <Button 
+          variant="outline" 
+          onClick={() => navigate("/challenges")} 
+          className="flex items-center"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Challenges
+        </Button>
+      </DashboardLayout>
+    );
+  }
+  
   return (
-    <DashboardLayout
-      title="Challenge Details"
-      subtitle="View hackathon information and register"
-      userRole={userRole}
+    <DashboardLayout 
+      title={hackathon.title} 
+      subtitle={`Organized by ${hackathon.company}`} 
+      userRole={authState.user?.role}
     >
       <div className="mb-6">
         <Button 
           variant="outline" 
-          onClick={() => navigate("/challenges")}
-          className="mb-6"
+          onClick={() => navigate("/challenges")} 
+          className="flex items-center"
         >
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Challenges
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Challenges
         </Button>
       </div>
-
+      
       {/* Challenge Header */}
-      <div className="bg-gradient-to-r from-hackathon-purple/10 to-hackathon-blue/10 rounded-lg p-6 mb-6">
-        <div className="flex flex-col md:flex-row gap-6 items-start">
-          <Avatar className="h-16 w-16 md:h-24 md:w-24">
-            <AvatarImage src={challenge.logo} />
-            <AvatarFallback>{challenge.company.substring(0, 2)}</AvatarFallback>
-          </Avatar>
-          
-          <div className="flex-1">
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <h1 className="text-2xl md:text-3xl font-bold">{challenge.title}</h1>
-              <Badge 
-                variant={challenge.status === "Active" ? "default" : 
-                       challenge.status === "Completed" ? "secondary" : "outline"}
-                className="ml-2"
-              >
-                {challenge.status}
-              </Badge>
+      <Card className="glass-card bg-gradient-to-br from-primary/5 to-transparent mb-8">
+        <CardContent className="pt-6">
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex-shrink-0">
+              <Avatar className="h-24 w-24">
+                <AvatarImage src={hackathon.logo} />
+                <AvatarFallback>{hackathon.company.substring(0, 2)}</AvatarFallback>
+              </Avatar>
             </div>
-            <p className="text-muted-foreground mb-2">Hosted by {challenge.company}</p>
-            <p className="mb-4">{challenge.description}</p>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-              <div className="flex items-center">
-                <Calendar className="h-5 w-5 mr-2 text-primary" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Dates</p>
-                  <p>{challenge.startDate} - {challenge.endDate}</p>
-                </div>
+            <div className="flex-1">
+              <div className="flex flex-wrap gap-2 mb-2">
+                <Badge variant={hackathon.status === "Active" ? "default" : 
+                      hackathon.status === "Completed" ? "secondary" : "outline"}>
+                  {hackathon.status}
+                </Badge>
+                
+                {hackathon.participationStatus && (
+                  <Badge variant="secondary" className="bg-primary/10">
+                    {hackathon.participationStatus}
+                  </Badge>
+                )}
+                
+                <Badge variant="outline" className="bg-primary/5">
+                  {hackathon.difficulty}
+                </Badge>
               </div>
-              <div className="flex items-center">
-                <Users className="h-5 w-5 mr-2 text-primary" />
+              
+              <h2 className="text-2xl font-bold mb-2">{hackathon.title}</h2>
+              <p className="text-muted-foreground mb-4">{hackathon.description}</p>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div>
-                  <p className="text-sm text-muted-foreground">Participants</p>
-                  <p>{challenge.participants} registered</p>
+                  <p className="text-sm text-muted-foreground">Start Date</p>
+                  <div className="flex items-center">
+                    <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <p className="font-medium">{hackathon.startDate}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center">
-                <Trophy className="h-5 w-5 mr-2 text-primary" />
+                
+                <div>
+                  <p className="text-sm text-muted-foreground">End Date</p>
+                  <div className="flex items-center">
+                    <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <p className="font-medium">{hackathon.endDate}</p>
+                  </div>
+                </div>
+                
                 <div>
                   <p className="text-sm text-muted-foreground">Prize Pool</p>
-                  <p>{challenge.prizePool}</p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <Clock className="h-5 w-5 mr-2 text-primary" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Registration Deadline</p>
-                  <p>{challenge.registrationDeadline}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex flex-wrap gap-1 mb-4">
-              {challenge.tags.map(tag => (
-                <Badge key={tag} variant="outline" className="bg-primary/5">
-                  {tag}
-                </Badge>
-              ))}
-              <Badge variant="outline" className="bg-primary/5">
-                {challenge.difficulty}
-              </Badge>
-            </div>
-            
-            <div className="flex flex-wrap gap-2 mt-4">
-              <Dialog open={registrationDialogOpen} onOpenChange={setRegistrationDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-gradient-to-r from-hackathon-purple to-hackathon-blue text-white hover:opacity-90">
-                    Register Now
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Register for {challenge.title}</DialogTitle>
-                    <DialogDescription>
-                      Choose a team to participate in this challenge with.
-                    </DialogDescription>
-                  </DialogHeader>
-                  
-                  <div className="py-4">
-                    <div className="space-y-4">
-                      <p className="text-sm">Team Size: 1-{challenge.maxTeamSize} members</p>
-                      
-                      <div className="space-y-2">
-                        <label htmlFor="team-select" className="text-sm font-medium">
-                          Select Team
-                        </label>
-                        <Select value={selectedTeam} onValueChange={setSelectedTeam}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a team" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {userTeams.map(team => (
-                              <SelectItem key={team.id} value={team.id}>
-                                {team.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        
-                        <p className="text-xs text-muted-foreground mt-2">
-                          Don't have a team yet? <a href="/my-teams" className="text-primary hover:underline">Create or join a team</a>
-                        </p>
-                      </div>
-                    </div>
+                  <div className="flex items-center">
+                    <Trophy className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <p className="font-medium">{hackathon.prizePool}</p>
                   </div>
-                  
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setRegistrationDialogOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button onClick={handleRegister}>
-                      Register Team
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+                </div>
+                
+                <div>
+                  <p className="text-sm text-muted-foreground">Participants</p>
+                  <div className="flex items-center">
+                    <Users className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <p className="font-medium">{hackathon.participants}</p>
+                  </div>
+                </div>
+              </div>
               
-              <Button variant="outline" className="hover:bg-primary/5" onClick={handleAddToCalendar}>
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                Add to Calendar
-              </Button>
-              
-              <Button variant="outline" className="hover:bg-primary/5">
-                <Share2 className="mr-2 h-4 w-4" />
-                Share
-              </Button>
+              <div className="flex flex-wrap gap-2 mt-4">
+                {hackathon.tags.map(tag => (
+                  <Badge key={tag} variant="secondary" className="bg-primary/10">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+        
+        <CardFooter className="flex flex-col sm:flex-row gap-4">
+          {/* If user is already registered */}
+          {hackathon.participationStatus === "Registered" ? (
+            <div className="flex flex-col sm:flex-row gap-4 w-full">
+              <Button className="flex-1 bg-green-600 hover:bg-green-700" disabled>
+                ✓ Registered
+              </Button>
+              <Button variant="outline" className="flex-1" onClick={() => navigate(`/teams?hackathon=${hackathon.id}`)}>
+                Join or Create Team
+              </Button>
+            </div>
+          ) : hackathon.participationStatus === "Interested" ? (
+            <div className="flex flex-col sm:flex-row gap-4 w-full">
+              <Button 
+                className="flex-1" 
+                disabled={registering || !hackathon.registrationOpen}
+                onClick={handleRegister}
+              >
+                {registering ? "Processing..." : "Register Now"}
+              </Button>
+              <Button variant="outline" className="flex-1" disabled>
+                Marked as Interested
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-4 w-full">
+              <Button 
+                className="flex-1" 
+                disabled={registering || !hackathon.registrationOpen}
+                onClick={handleRegister}
+              >
+                {registering ? "Processing..." : "Register Now"}
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                disabled={registering}
+                onClick={handleMarkInterested}
+              >
+                {registering ? "Processing..." : "I'm Interested"}
+              </Button>
+            </div>
+          )}
+        </CardFooter>
+      </Card>
       
-      {/* Challenge Details Tabs */}
-      <Tabs defaultValue="details" className="w-full">
-        <TabsList className="w-full md:w-auto grid grid-cols-4 md:flex md:gap-4 h-auto">
-          <TabsTrigger value="details" className="py-2 text-sm md:text-base">Details</TabsTrigger>
-          <TabsTrigger value="timeline" className="py-2 text-sm md:text-base">Timeline</TabsTrigger>
-          <TabsTrigger value="prizes" className="py-2 text-sm md:text-base">Prizes</TabsTrigger>
-          <TabsTrigger value="resources" className="py-2 text-sm md:text-base">Resources</TabsTrigger>
+      {/* Challenge Content */}
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="mb-4">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="schedule">Schedule</TabsTrigger>
+          <TabsTrigger value="rules">Rules & Guidelines</TabsTrigger>
+          <TabsTrigger value="resources">Resources</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="details" className="mt-6">
+        <TabsContent value="overview">
           <Card>
             <CardHeader>
-              <CardTitle>Challenge Description</CardTitle>
+              <CardTitle>Challenge Overview</CardTitle>
+              <CardDescription>Learn more about this hackathon challenge</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <h3 className="text-lg font-medium mb-2">About this Challenge</h3>
-                <p>{challenge.longDescription}</p>
+            <CardContent className="space-y-4">
+              <p>{hackathon.description}</p>
+              
+              <h3 className="text-lg font-semibold mt-6">About the Organizer</h3>
+              <div className="flex items-start gap-4">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={hackathon.logo} />
+                  <AvatarFallback>{hackathon.company.substring(0, 2)}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <h4 className="font-medium">{hackathon.company}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {hackathon.company} is organizing this challenge to foster innovation and 
+                    identify talented developers for potential collaboration.
+                  </p>
+                </div>
               </div>
               
-              <div>
-                <h3 className="text-lg font-medium mb-2">Rules & Requirements</h3>
-                <ul className="list-disc pl-5 space-y-1">
-                  {challenge.rules.map((rule, index) => (
-                    <li key={index}>{rule}</li>
-                  ))}
-                </ul>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-medium mb-2">Judges</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {challenge.judges.map((judge, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 rounded-md border">
-                      <Avatar>
-                        <AvatarFallback>{judge.name.substring(0, 2)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium">{judge.name}</p>
-                        <p className="text-sm text-muted-foreground">{judge.role} at {judge.company}</p>
-                      </div>
-                    </div>
-                  ))}
+              <h3 className="text-lg font-semibold mt-6">Expected Outcomes</h3>
+              <ul className="list-disc pl-6 space-y-2">
+                <li>A working prototype demonstrating your solution</li>
+                <li>Source code repository with documentation</li>
+                <li>A 5-minute presentation explaining your approach</li>
+                <li>A brief writeup of challenges faced and how you overcame them</li>
+              </ul>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="schedule">
+          <Card>
+            <CardHeader>
+              <CardTitle>Event Schedule</CardTitle>
+              <CardDescription>Timeline and important dates</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row gap-4 items-start border-b pb-4">
+                  <div className="min-w-[120px] text-primary">
+                    <p className="font-bold">{hackathon.startDate}</p>
+                    <p className="text-sm">9:00 AM</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Kickoff Event</h3>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Welcome address and challenge announcement
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-4 items-start border-b pb-4">
+                  <div className="min-w-[120px] text-primary">
+                    <p className="font-bold">{hackathon.startDate}</p>
+                    <p className="text-sm">1:00 PM</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Team Formation</h3>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Find teammates and start collaborating
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-4 items-start border-b pb-4">
+                  <div className="min-w-[120px] text-primary">
+                    <p className="font-bold">{hackathon.endDate}</p>
+                    <p className="text-sm">2:00 PM</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Final Submissions</h3>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Deadline for project submissions
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-4 items-start">
+                  <div className="min-w-[120px] text-primary">
+                    <p className="font-bold">{hackathon.endDate}</p>
+                    <p className="text-sm">5:00 PM</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Judging and Awards</h3>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Project presentations and winner announcement
+                    </p>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
         
-        <TabsContent value="timeline" className="mt-6">
+        <TabsContent value="rules">
           <Card>
             <CardHeader>
-              <CardTitle>Event Timeline</CardTitle>
-              <CardDescription>Important dates for this challenge</CardDescription>
+              <CardTitle>Rules & Guidelines</CardTitle>
+              <CardDescription>Participation requirements and judging criteria</CardDescription>
             </CardHeader>
-            <CardContent>
-              <ol className="relative border-l border-primary/20 ml-3 space-y-6">
-                {challenge.timeline.map((item, index) => (
-                  <li key={index} className="mb-10 ml-6">
-                    <span className="absolute flex items-center justify-center w-6 h-6 rounded-full -left-3 ring-8 ring-background bg-primary/10">
-                      <span className="w-2 h-2 rounded-full bg-primary"></span>
-                    </span>
-                    <h3 className="font-medium">{item.event}</h3>
-                    <time className="block text-sm text-muted-foreground">{item.date}</time>
-                  </li>
-                ))}
-              </ol>
+            <CardContent className="space-y-4">
+              <h3 className="font-semibold">Eligibility</h3>
+              <ul className="list-disc pl-6 space-y-2 text-sm">
+                <li>Open to all registered participants</li>
+                <li>Teams of 2-5 members are allowed</li>
+                <li>Members can be from different organizations</li>
+                <li>All team members must be registered on the platform</li>
+              </ul>
+              
+              <h3 className="font-semibold mt-4">Submission Guidelines</h3>
+              <ul className="list-disc pl-6 space-y-2 text-sm">
+                <li>All code must be original or properly attributed</li>
+                <li>Projects must be submitted before the deadline</li>
+                <li>Include documentation and setup instructions</li>
+                <li>Submit through the platform's project submission form</li>
+              </ul>
+              
+              <h3 className="font-semibold mt-4">Judging Criteria</h3>
+              <ul className="list-disc pl-6 space-y-2 text-sm">
+                <li><span className="font-medium">Innovation (25%)</span>: Originality and creativity of the solution</li>
+                <li><span className="font-medium">Functionality (25%)</span>: How well the solution works</li>
+                <li><span className="font-medium">Technical Complexity (20%)</span>: Appropriate use of technology</li>
+                <li><span className="font-medium">User Experience (15%)</span>: Design and usability</li>
+                <li><span className="font-medium">Presentation (15%)</span>: Quality of demo and explanation</li>
+              </ul>
             </CardContent>
           </Card>
         </TabsContent>
         
-        <TabsContent value="prizes" className="mt-6">
+        <TabsContent value="resources">
           <Card>
             <CardHeader>
-              <CardTitle>Prizes & Rewards</CardTitle>
-              <CardDescription>What you can win in this challenge</CardDescription>
+              <CardTitle>Resources</CardTitle>
+              <CardDescription>Helpful materials and support</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="grid gap-6">
-                {challenge.prizes.map((prize, index) => (
-                  <div key={index} className={`flex items-center gap-4 p-4 rounded-lg border ${index === 0 ? 'bg-yellow-50 border-yellow-200 dark:bg-yellow-950/20 dark:border-yellow-900' : ''}`}>
-                    <div className={`flex items-center justify-center w-12 h-12 rounded-full 
-                      ${index === 0 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : 
-                        index === 1 ? 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300' : 
-                        'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'}`}>
-                      <Trophy className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium">{prize.position}</h3>
-                      <p className="text-muted-foreground">{prize.prize}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="resources" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Resources & Tools</CardTitle>
-              <CardDescription>Helpful resources for participants</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4">
-                {challenge.resources.map((resource, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Download className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{resource.name}</p>
-                        <p className="text-sm text-muted-foreground">{resource.type}</p>
-                      </div>
-                    </div>
-                    <Button variant="ghost" size="sm" asChild>
-                      <a href={resource.url} target="_blank" rel="noopener noreferrer">
-                        Access
-                      </a>
-                    </Button>
-                  </div>
-                ))}
+            <CardContent className="space-y-4">
+              <h3 className="font-semibold">Documentation & APIs</h3>
+              <ul className="list-disc pl-6 space-y-2 text-sm">
+                <li>API documentation is available in the Resources section</li>
+                <li>Sample code and starter projects are provided</li>
+                <li>Access to test environments will be granted upon registration</li>
+              </ul>
+              
+              <h3 className="font-semibold mt-4">Support Channels</h3>
+              <ul className="list-disc pl-6 space-y-2 text-sm">
+                <li>Discord channel for real-time support</li>
+                <li>Office hours with mentors (schedule in Calendar)</li>
+                <li>FAQ section for common questions</li>
+              </ul>
+              
+              <h3 className="font-semibold mt-4">Downloads</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                <Button variant="outline" className="justify-start">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Challenge Brief PDF
+                </Button>
+                <Button variant="outline" className="justify-start">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  API Documentation
+                </Button>
+                <Button variant="outline" className="justify-start">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Starter Templates
+                </Button>
+                <Button variant="outline" className="justify-start">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Judging Rubric
+                </Button>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
+      
+      <div className="mt-8 flex justify-between">
+        <Button 
+          variant="outline" 
+          onClick={() => navigate("/challenges")} 
+          className="flex items-center"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Challenges
+        </Button>
+        
+        {/* Show registration button again at the bottom */}
+        {hackathon.participationStatus !== "Registered" && (
+          <Button 
+            onClick={handleRegister} 
+            disabled={registering || !hackathon.registrationOpen || hackathon.participationStatus === "Registered"}
+          >
+            {registering ? "Processing..." : 
+             hackathon.participationStatus === "Registered" ? "Already Registered" : "Register Now"}
+          </Button>
+        )}
+      </div>
     </DashboardLayout>
   );
 };
