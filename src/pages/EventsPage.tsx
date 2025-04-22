@@ -1,18 +1,21 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { Calendar, Bell, Plus } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar, Bell, Plus, Info } from "lucide-react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 const EventsPage = () => {
   const { authState } = useAuth();
   const userRole = authState.user?.role || "student";
   const canCreateEvents = userRole === "company" || userRole === "college";
   const navigate = useNavigate();
+  const [calendarDialogOpen, setCalendarDialogOpen] = useState(false);
 
   const upcomingEvents = [
     {
@@ -63,6 +66,125 @@ const EventsPage = () => {
         return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
     }
   };
+  
+  const handleSubscribeToCalendar = () => {
+    // In a real app, this would generate and download an .ics file with all events
+    // Generate an ICS for all events
+    const icsData = generateCalendarICS(upcomingEvents);
+    downloadICSFile(icsData, "hackathon-events.ics");
+    
+    toast.success("Events calendar downloaded successfully!");
+    setCalendarDialogOpen(false);
+  };
+  
+  // Function to download events calendar
+  const handleAddToCalendar = (event) => {
+    const icsData = generateEventICS(event);
+    downloadICSFile(icsData, `${event.title.replace(/\s+/g, '-').toLowerCase()}.ics`);
+    toast.success(`"${event.title}" added to your calendar`);
+  };
+  
+  // Function to generate ICS for a single event
+  const generateEventICS = (event) => {
+    // Convert date and time to proper format
+    const [month, day, year] = event.date.split(", ")[0].split(" ");
+    const monthNum = getMonthNumber(month);
+    const [hour, minute] = event.time.split(":");
+    const ampm = minute.slice(-2);
+    const hour24 = convertTo24Hour(parseInt(hour), ampm);
+    const minuteNum = parseInt(minute);
+    
+    const startDate = new Date(parseInt(year), monthNum - 1, parseInt(day), hour24, minuteNum);
+    const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // Add 1 hour for duration
+    
+    return `BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+SUMMARY:${event.title}
+DESCRIPTION:${event.description}
+DTSTART:${formatDateForICS(startDate)}
+DTEND:${formatDateForICS(endDate)}
+STATUS:CONFIRMED
+SEQUENCE:0
+END:VEVENT
+END:VCALENDAR`;
+  };
+  
+  // Function to generate ICS for multiple events
+  const generateCalendarICS = (events) => {
+    let icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+`;
+
+    events.forEach(event => {
+      // Convert date and time to proper format
+      const [month, day, year] = event.date.split(", ")[0].split(" ");
+      const monthNum = getMonthNumber(month);
+      const [hour, minute] = event.time.split(":");
+      const ampm = minute.slice(-2);
+      const hour24 = convertTo24Hour(parseInt(hour), ampm);
+      const minuteNum = parseInt(minute);
+      
+      const startDate = new Date(parseInt(year), monthNum - 1, parseInt(day), hour24, minuteNum);
+      const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // Add 1 hour for duration
+      
+      icsContent += `BEGIN:VEVENT
+SUMMARY:${event.title}
+DESCRIPTION:${event.description}
+DTSTART:${formatDateForICS(startDate)}
+DTEND:${formatDateForICS(endDate)}
+STATUS:CONFIRMED
+SEQUENCE:0
+END:VEVENT
+`;
+    });
+    
+    icsContent += "END:VCALENDAR";
+    return icsContent;
+  };
+  
+  // Helper function to convert month name to number
+  const getMonthNumber = (month) => {
+    const months = {
+      "Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6,
+      "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12
+    };
+    return months[month];
+  };
+  
+  // Helper function to convert 12-hour to 24-hour format
+  const convertTo24Hour = (hour, ampm) => {
+    if (ampm.includes("PM") && hour !== 12) {
+      return hour + 12;
+    }
+    if (ampm.includes("AM") && hour === 12) {
+      return 0;
+    }
+    return hour;
+  };
+
+  // Format date for ICS file
+  const formatDateForICS = (date) => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${year}${month}${day}T${hours}${minutes}00Z`;
+  };
+  
+  // Download ICS file
+  const downloadICSFile = (content, filename) => {
+    const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <DashboardLayout
@@ -86,10 +208,49 @@ const EventsPage = () => {
                 Create Event
               </Button>
             )}
-            <Button variant="outline" className="hover:scale-105 transition-transform animate-fade-in">
-              <Bell className="mr-2 h-4 w-4" />
-              Subscribe to Calendar
-            </Button>
+            <Dialog open={calendarDialogOpen} onOpenChange={setCalendarDialogOpen}>
+              <Button 
+                variant="outline" 
+                className="hover:scale-105 transition-transform animate-fade-in"
+                onClick={() => setCalendarDialogOpen(true)}
+              >
+                <Bell className="mr-2 h-4 w-4" />
+                Subscribe to Calendar
+              </Button>
+              
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Subscribe to Events Calendar</DialogTitle>
+                  <DialogDescription>
+                    Download the calendar file (.ics) to add all events to your preferred calendar app.
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <div className="py-4">
+                  <div className="flex items-start gap-4 p-4 border rounded-lg bg-muted/40">
+                    <Info className="h-5 w-5 text-muted-foreground mt-0.5" />
+                    <div>
+                      <h4 className="font-medium mb-1">How to use the calendar file</h4>
+                      <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
+                        <li>Download the .ics file</li>
+                        <li>Open your calendar application (Google Calendar, Apple Calendar, Outlook, etc.)</li>
+                        <li>Import or open the downloaded file</li>
+                        <li>All events will be added to your calendar</li>
+                      </ol>
+                    </div>
+                  </div>
+                </div>
+                
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setCalendarDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleSubscribeToCalendar}>
+                    Download Calendar (.ics)
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
@@ -111,7 +272,12 @@ const EventsPage = () => {
               <CardContent>
                 <p className="text-sm text-muted-foreground">{event.description}</p>
                 <div className="flex justify-end mt-4">
-                  <Button variant="outline" size="sm" className="hover:bg-primary/10 hover:scale-105 transition-transform">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="hover:bg-primary/10 hover:scale-105 transition-transform"
+                    onClick={() => handleAddToCalendar(event)}
+                  >
                     Add to Calendar
                   </Button>
                 </div>

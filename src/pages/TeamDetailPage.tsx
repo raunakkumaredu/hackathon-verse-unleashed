@@ -1,0 +1,345 @@
+
+import React from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { useAuth } from "@/contexts/AuthContext";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Users, Code, MessageSquare, CalendarClock, ArrowLeft, Plus, Share2, Trophy } from "lucide-react";
+import { toast } from "sonner";
+
+// Mock team data
+const teamData = {
+  "team1": {
+    id: "team1",
+    name: "Code Wizards",
+    description: "A team focused on creating innovative solutions using AI and machine learning.",
+    createdAt: "April 5, 2025",
+    members: [
+      { id: "1", name: "Alex Johnson", role: "Team Lead", avatar: "https://ui-avatars.com/api/?name=AJ&background=random" },
+      { id: "2", name: "Sam Smith", role: "UX Designer", avatar: "https://ui-avatars.com/api/?name=SS&background=random" },
+      { id: "3", name: "Taylor Reed", role: "Data Scientist", avatar: "https://ui-avatars.com/api/?name=TR&background=random" }
+    ],
+    skills: ["React", "Python", "Machine Learning", "UI/UX"],
+    currentChallenges: [
+      { id: "1", name: "AI Innovation Challenge", status: "Registered", deadline: "May 17, 2025" }
+    ],
+    pastChallenges: [],
+    discussions: [
+      { id: "disc1", author: "Alex Johnson", content: "Let's start brainstorming ideas for the AI challenge.", timestamp: "2 days ago", replies: 3 },
+      { id: "disc2", author: "Sam Smith", content: "I've found some interesting research papers that might help us.", timestamp: "1 day ago", replies: 1 }
+    ],
+    meetings: [
+      { id: "meet1", title: "Kickoff Meeting", date: "April 25, 2025", time: "3:00 PM", location: "Virtual" },
+      { id: "meet2", title: "Progress Check", date: "May 2, 2025", time: "4:00 PM", location: "Virtual" }
+    ]
+  },
+  "team2": {
+    id: "team2",
+    name: "Tech Titans",
+    description: "Solving cutting-edge problems with innovative tech solutions.",
+    createdAt: "April 10, 2025",
+    members: [
+      { id: "4", name: "Jordan Lee", role: "Backend Developer", avatar: "https://ui-avatars.com/api/?name=JL&background=random" },
+      { id: "5", name: "Casey Taylor", role: "Frontend Developer", avatar: "https://ui-avatars.com/api/?name=CT&background=random" }
+    ],
+    skills: ["Node.js", "React", "AWS", "Firebase"],
+    currentChallenges: [
+      { id: "2", name: "Web3 Development Challenge", status: "Registered", deadline: "June 22, 2025" }
+    ],
+    pastChallenges: [],
+    discussions: [
+      { id: "disc3", author: "Jordan Lee", content: "Here's the architecture I'm thinking for our blockchain project.", timestamp: "3 days ago", replies: 2 }
+    ],
+    meetings: [
+      { id: "meet3", title: "Planning Session", date: "April 28, 2025", time: "5:00 PM", location: "Virtual" }
+    ]
+  }
+};
+
+const TeamDetailPage = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { authState } = useAuth();
+  const userRole = authState.user?.role || "student";
+  
+  const team = id ? teamData[id] : null;
+  
+  if (!team) {
+    return (
+      <DashboardLayout
+        title="Team Details"
+        subtitle="View team information"
+        userRole={userRole}
+      >
+        <div className="flex flex-col items-center justify-center py-20">
+          <h2 className="text-2xl font-bold mb-4">Team not found</h2>
+          <p className="text-muted-foreground mb-6">
+            The team you're looking for doesn't exist or has been removed.
+          </p>
+          <Button onClick={() => navigate("/my-teams")}>
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to My Teams
+          </Button>
+        </div>
+      </DashboardLayout>
+    );
+  }
+  
+  const handlePostDiscussion = () => {
+    toast.success("Discussion post created!");
+  };
+  
+  const handleScheduleMeeting = () => {
+    toast.success("Meeting scheduled!");
+  };
+
+  return (
+    <DashboardLayout
+      title="Team Details"
+      subtitle="View and manage your team"
+      userRole={userRole}
+    >
+      <div className="mb-6">
+        <Button 
+          variant="outline" 
+          onClick={() => navigate("/my-teams")}
+          className="mb-6"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to My Teams
+        </Button>
+      </div>
+      
+      {/* Team Header */}
+      <div className="bg-gradient-to-r from-hackathon-purple/10 to-hackathon-blue/10 rounded-lg p-6 mb-6">
+        <div className="flex flex-col md:flex-row gap-6 items-start">
+          <div className="h-20 w-20 md:h-24 md:w-24 rounded-full bg-primary/10 flex items-center justify-center">
+            <Users className="h-10 w-10 text-primary" />
+          </div>
+          
+          <div className="flex-1">
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">{team.name}</h1>
+            <p className="text-muted-foreground mb-4">Team created on {team.createdAt}</p>
+            <p className="mb-4">{team.description}</p>
+            
+            <div className="flex flex-wrap gap-1 mb-4">
+              {team.skills.map(skill => (
+                <Badge key={skill} variant="outline" className="bg-primary/5">
+                  {skill}
+                </Badge>
+              ))}
+            </div>
+            
+            <div className="flex flex-wrap gap-2 mt-4">
+              <Button variant="outline" className="hover:bg-primary/5">
+                <Share2 className="mr-2 h-4 w-4" />
+                Invite Members
+              </Button>
+              
+              <Button variant="outline" className="hover:bg-primary/5" onClick={() => navigate(`/challenges`)}>
+                <Trophy className="mr-2 h-4 w-4" />
+                Find Challenges
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Team Details Tabs */}
+      <Tabs defaultValue="members" className="w-full">
+        <TabsList className="w-full md:w-auto grid grid-cols-4 md:flex md:gap-4 h-auto">
+          <TabsTrigger value="members" className="py-2 text-sm md:text-base">Members</TabsTrigger>
+          <TabsTrigger value="challenges" className="py-2 text-sm md:text-base">Challenges</TabsTrigger>
+          <TabsTrigger value="discussions" className="py-2 text-sm md:text-base">Discussions</TabsTrigger>
+          <TabsTrigger value="meetings" className="py-2 text-sm md:text-base">Meetings</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="members" className="mt-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Team Members</CardTitle>
+                <CardDescription>Current team roster ({team.members.length} members)</CardDescription>
+              </div>
+              <Button size="sm">
+                <Plus className="h-4 w-4 mr-2" /> Add Member
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                {team.members.map(member => (
+                  <div key={member.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Avatar>
+                        <AvatarImage src={member.avatar} />
+                        <AvatarFallback>{member.name.substring(0, 2)}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium">{member.name}</p>
+                        <p className="text-sm text-muted-foreground">{member.role}</p>
+                      </div>
+                    </div>
+                    <Button variant="ghost" size="sm">
+                      Message
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="challenges" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Current Challenges</CardTitle>
+              <CardDescription>Hackathons this team is participating in</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {team.currentChallenges.length > 0 ? (
+                <div className="grid gap-4">
+                  {team.currentChallenges.map(challenge => (
+                    <div key={challenge.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Trophy className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{challenge.name}</p>
+                          <p className="text-sm text-muted-foreground">Status: {challenge.status} • Due: {challenge.deadline}</p>
+                        </div>
+                      </div>
+                      <Button variant="outline" size="sm" onClick={() => navigate(`/challenges/${challenge.id}`)}>
+                        View Challenge
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground mb-4">This team is not currently participating in any challenges</p>
+                  <Button onClick={() => navigate('/challenges')}>
+                    <Plus className="mr-2 h-4 w-4" /> Join a Challenge
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+            
+            <CardHeader className="border-t pt-6">
+              <CardTitle>Past Challenges</CardTitle>
+              <CardDescription>Previous hackathons this team participated in</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {team.pastChallenges.length > 0 ? (
+                <div className="grid gap-4">
+                  {team.pastChallenges.map(challenge => (
+                    <div key={challenge.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div>
+                        <p className="font-medium">{challenge.name}</p>
+                        <p className="text-sm text-muted-foreground">Result: {challenge.result}</p>
+                      </div>
+                      <Button variant="ghost" size="sm">
+                        View Details
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center text-muted-foreground py-4">No past challenges</p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="discussions" className="mt-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Team Discussions</CardTitle>
+                <CardDescription>Chat with your team members</CardDescription>
+              </div>
+              <Button size="sm" onClick={handlePostDiscussion}>
+                <Plus className="h-4 w-4 mr-2" /> New Discussion
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {team.discussions.length > 0 ? (
+                <div className="grid gap-4">
+                  {team.discussions.map(discussion => (
+                    <div key={discussion.id} className="p-4 border rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-medium">{discussion.author}</span>
+                        <span className="text-sm text-muted-foreground">{discussion.timestamp}</span>
+                      </div>
+                      <p className="mb-3">{discussion.content}</p>
+                      <div className="flex justify-between items-center">
+                        <Button variant="ghost" size="sm" className="text-muted-foreground">
+                          <MessageSquare className="h-4 w-4 mr-2" />
+                          {discussion.replies} {discussion.replies === 1 ? 'Reply' : 'Replies'}
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          Reply
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center text-muted-foreground py-4">No discussions yet</p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="meetings" className="mt-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Team Meetings</CardTitle>
+                <CardDescription>Schedule and manage team meetings</CardDescription>
+              </div>
+              <Button size="sm" onClick={handleScheduleMeeting}>
+                <Plus className="h-4 w-4 mr-2" /> Schedule Meeting
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {team.meetings.length > 0 ? (
+                <div className="grid gap-4">
+                  {team.meetings.map(meeting => (
+                    <div key={meeting.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <CalendarClock className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{meeting.title}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {meeting.date} at {meeting.time} • {meeting.location}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm">
+                          Join
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          Details
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center text-muted-foreground py-4">No upcoming meetings</p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </DashboardLayout>
+  );
+};
+
+export default TeamDetailPage;

@@ -44,6 +44,9 @@ import SupportPage from "./pages/SupportPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import MenteesPage from "./pages/MenteesPage";
 import AvailabilityPage from "./pages/AvailabilityPage";
+import ChallengeDetailPage from "./pages/ChallengeDetailPage";
+import TeamDetailPage from "./pages/TeamDetailPage";
+import MyTeamsPage from "./pages/MyTeamsPage";
 
 const queryClient = new QueryClient();
 
@@ -109,6 +112,13 @@ const App = () => (
                   </ProtectedRoute>
                 } />
                 
+                {/* New Route for Challenge Detail */}
+                <Route path="challenges/:id" element={
+                  <ProtectedRoute>
+                    <ChallengeDetailPage />
+                  </ProtectedRoute>
+                } />
+                
                 {/* New Route for Creating Challenges */}
                 <Route path="challenges/create" element={
                   <ProtectedRoute allowedRoles={["company", "college"]}>
@@ -119,6 +129,20 @@ const App = () => (
                 <Route path="teams" element={
                   <ProtectedRoute>
                     <TeamsPage />
+                  </ProtectedRoute>
+                } />
+                
+                {/* New Route for Team Detail */}
+                <Route path="teams/:id" element={
+                  <ProtectedRoute>
+                    <TeamDetailPage />
+                  </ProtectedRoute>
+                } />
+                
+                {/* New Route for My Teams */}
+                <Route path="my-teams" element={
+                  <ProtectedRoute>
+                    <MyTeamsPage />
                   </ProtectedRoute>
                 } />
                 
