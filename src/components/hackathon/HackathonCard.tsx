@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Trophy, Users, Clock } from "lucide-react";
+import { Calendar, Trophy, Users, Clock, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { HackathonWithParticipation } from '@/services/hackathonService';
 import { useAuth } from "@/contexts/AuthContext";
@@ -121,7 +120,7 @@ export const HackathonCard: React.FC<HackathonCardProps> = ({
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" size="icon">
-                <trash className="h-4 w-4" />
+                <Trash className="h-4 w-4" />
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Search, Filter, Trophy, Clock, Users, Plus } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { HackathonCard } from "@/components/hackathon/HackathonCard";
 import { fetchAllHackathons, HackathonWithParticipation } from "@/services/hackathonService";
-import { MessageModal } from "@/components/ui/MessageModal";
+import MessageModal from "@/components/ui/MessageModal";
 import { toast } from "sonner";
 
 const ChallengesPage = () => {
@@ -61,7 +60,6 @@ const ChallengesPage = () => {
   });
 
   const handleDeleteHackathon = () => {
-    // Refresh hackathons after deletion
     fetchAllHackathons(authState.user?.id).then(data => {
       setHackathons(data);
       setShowSuccessMessage(true);

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -29,7 +28,6 @@ const ChallengeDetailPage = () => {
       
       setIsLoading(true);
       try {
-        // Fetch the hackathon details
         const { data, error } = await supabase
           .from('hackathons')
           .select('*')
@@ -42,7 +40,6 @@ const ChallengeDetailPage = () => {
           return;
         }
         
-        // Check if user is participating
         let participationStatus = null;
         if (authState.user?.id) {
           const { data: participation } = await supabase
@@ -186,7 +183,6 @@ const ChallengeDetailPage = () => {
         </Button>
       </div>
       
-      {/* Challenge Header */}
       <Card className="glass-card bg-gradient-to-br from-primary/5 to-transparent mb-8">
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row gap-6">
@@ -264,7 +260,6 @@ const ChallengeDetailPage = () => {
         </CardContent>
         
         <CardFooter className="flex flex-col sm:flex-row gap-4">
-          {/* If user is already registered */}
           {hackathon.participationStatus === "Registered" ? (
             <div className="flex flex-col sm:flex-row gap-4 w-full">
               <Button className="flex-1 bg-green-600 hover:bg-green-700" disabled>
@@ -309,7 +304,6 @@ const ChallengeDetailPage = () => {
         </CardFooter>
       </Card>
       
-      {/* Challenge Content */}
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -507,7 +501,6 @@ const ChallengeDetailPage = () => {
           Back to Challenges
         </Button>
         
-        {/* Show registration button again at the bottom */}
         {hackathon.participationStatus !== "Registered" && (
           <Button 
             onClick={handleRegister} 
