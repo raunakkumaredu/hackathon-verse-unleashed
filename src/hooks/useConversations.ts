@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { getMockConversations } from "@/utils/mockConversations";
 import { getRandomReplyMessage } from "@/utils/randomReply";
 import { toast } from "sonner";
@@ -19,7 +19,7 @@ export function useConversations() {
     if (mock.length > 0) setActiveConversation(mock[0].id);
   }, [authState.user?.id]);
 
-  function handleSendMessage() {
+  const handleSendMessage = useCallback(() => {
     if (!currentMessage.trim() || !activeConversation) return;
 
     const newMessage: Message = {
@@ -44,6 +44,8 @@ export function useConversations() {
     );
 
     setCurrentMessage("");
+    
+    // Delay the system reply to improve perceived performance
     setTimeout(() => {
       setConversations((prev) =>
         prev.map((c) => {
@@ -71,15 +73,19 @@ export function useConversations() {
     }, 800);
 
     toast.success("Message sent!");
-  }
+  }, [currentMessage, activeConversation, authState.user?.id]);
 
-  const filteredConversations = conversations.filter((c) =>
-    c.participantName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredConversations = useMemo(() => {
+    return conversations.filter((c) =>
+      c.participantName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [conversations, searchQuery]);
 
-  const activeConvo = conversations.find((c) => c.id === activeConversation);
+  const activeConvo = useMemo(() => {
+    return conversations.find((c) => c.id === activeConversation);
+  }, [conversations, activeConversation]);
 
-  function setReadAllActive() {
+  const setReadAllActive = useCallback(() => {
     setConversations((prev) =>
       prev.map((c) =>
         c.id === activeConversation
@@ -91,13 +97,27 @@ export function useConversations() {
           : c
       )
     );
-  }
+  }, [activeConversation]);
 
   return {
     conversations,
     filteredConversations,
     activeConversation,
-    setActiveConversation,
+    setActiveConversation: useCallback((id: string) => {
+      setActiveConversation(id);
+      // Mark as read when selecting a conversation
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.id === id
+            ? {
+                ...c,
+                unreadCount: 0,
+                messages: c.messages.map((m) => ({ ...m, read: true })),
+              }
+            : c
+        )
+      );
+    }, []),
     activeConvo,
     currentMessage,
     setCurrentMessage,
