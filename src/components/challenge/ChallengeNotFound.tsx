@@ -4,9 +4,10 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { UserRole } from "@/types/auth";
 
 interface ChallengeNotFoundProps {
-  userRole: string | undefined;
+  userRole: UserRole | undefined;
   error?: string | null;
   onBack: () => void;
 }

@@ -1,9 +1,10 @@
 
 import React from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { UserRole } from "@/types/auth";
 
 interface ChallengeLoadingProps {
-  userRole: string | undefined;
+  userRole: UserRole | undefined;
 }
 
 const ChallengeLoading: React.FC<ChallengeLoadingProps> = ({ userRole }) => (
