@@ -1,7 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { User, UserRole, AuthState } from "@/types/auth";
+import { User, UserRole } from "@/types/auth";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+
+export interface AuthState {
+  user: User | null;
+  isLoading: boolean;
+  error: string | null;
+}
 
 interface AuthContextType {
   authState: AuthState;
