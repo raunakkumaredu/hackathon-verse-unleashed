@@ -1,14 +1,17 @@
-import React from "react";
+
+import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart as BarChartIcon, LineChart, PieChart, CircleDot, BarChartHorizontal } from "lucide-react";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart as RechartsLineChart, Line, PieChart as RechartsPieChart, Pie, Cell } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart as RechartsLineChart, Line, PieChart as RechartsPieChart, Pie, Cell, AreaChart, Area } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 const AnalyticsPage = () => {
   const { authState } = useAuth();
+  const [timeFilter, setTimeFilter] = useState("all");
   
   // Mock chart data
   const hackathonParticipationData = [
@@ -47,6 +50,55 @@ const AnalyticsPage = () => {
     { name: 'Mobile App', completed: 75, registered: 100 },
     { name: 'Cloud Hack', completed: 80, registered: 100 },
   ];
+
+  // New: Skills growth data
+  const skillsGrowthData = [
+    { month: 'Jan', javascript: 60, python: 40, react: 55, design: 35 },
+    { month: 'Feb', javascript: 65, python: 45, react: 60, design: 40 },
+    { month: 'Mar', javascript: 70, python: 55, react: 68, design: 45 },
+    { month: 'Apr', javascript: 75, python: 60, react: 75, design: 52 },
+    { month: 'May', javascript: 85, python: 70, react: 83, design: 58 },
+    { month: 'Jun', javascript: 90, python: 75, react: 88, design: 65 },
+  ];
+  
+  // New: Achievement timeline data
+  const achievementTimelineData = [
+    { 
+      date: '2025-01-15', 
+      achievement: 'First Hackathon Completed', 
+      description: 'Successfully completed your first hackathon event',
+      points: 50
+    },
+    { 
+      date: '2025-02-28', 
+      achievement: 'Team Formation', 
+      description: 'Created your first hackathon team',
+      points: 30
+    },
+    { 
+      date: '2025-03-15', 
+      achievement: 'Project Submission', 
+      description: 'Submitted your first project for evaluation',
+      points: 75
+    },
+    { 
+      date: '2025-04-10', 
+      achievement: 'Top 10 Finish', 
+      description: 'Your team placed in the top 10 of the hackathon',
+      points: 100
+    },
+    { 
+      date: '2025-05-22', 
+      achievement: 'Mentorship Program', 
+      description: 'Started mentoring new hackathon participants',
+      points: 80
+    },
+  ];
+  
+  // Function to handle time filter changes
+  const handleTimeFilterChange = (value: string) => {
+    setTimeFilter(value);
+  };
   
   return (
     <DashboardLayout
@@ -55,7 +107,7 @@ const AnalyticsPage = () => {
       userRole={authState.user?.role}
     >
       <div className="mb-6 flex justify-end animate-fade-in animate-delay-100">
-        <Select defaultValue="all">
+        <Select defaultValue="all" onValueChange={handleTimeFilterChange}>
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Filter by time" />
           </SelectTrigger>
@@ -231,7 +283,7 @@ const AnalyticsPage = () => {
           </Card>
         </TabsContent>
       </Tabs>
-      {/* Personal Progress Section */}
+      {/* Personal Progress Section with implemented Skills Growth Chart and Achievement Timeline */}
       <div className="mt-8">
         <h2 className="text-2xl font-semibold mb-6">Your Progress</h2>
         
@@ -242,12 +294,20 @@ const AnalyticsPage = () => {
               <CardDescription>Your skill development over time</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12">
-                <LineChart className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-semibold">Skills Growth Chart Coming Soon</h3>
-                <p className="text-muted-foreground max-w-md mx-auto mt-2">
-                  Complete more hackathons to see your skills growth chart.
-                </p>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={skillsGrowthData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis domain={[0, 100]} />
+                    <Tooltip />
+                    <Legend />
+                    <Area type="monotone" dataKey="javascript" stackId="1" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+                    <Area type="monotone" dataKey="python" stackId="1" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.6} />
+                    <Area type="monotone" dataKey="react" stackId="1" stroke="#ffc658" fill="#ffc658" fillOpacity={0.6} />
+                    <Area type="monotone" dataKey="design" stackId="1" stroke="#ff8042" fill="#ff8042" fillOpacity={0.6} />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
@@ -258,12 +318,27 @@ const AnalyticsPage = () => {
               <CardDescription>Your key milestones and accomplishments</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12">
-                <CircleDot className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-semibold">Achievement Timeline Coming Soon</h3>
-                <p className="text-muted-foreground max-w-md mx-auto mt-2">
-                  Your hackathon milestones will appear here as you participate in more events.
-                </p>
+              <div className="space-y-4">
+                {achievementTimelineData.map((achievement, index) => (
+                  <div key={index} className="flex">
+                    <div className="mr-4 flex flex-col items-center">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        {index % 2 === 0 ? 
+                          <Trophy className="h-5 w-5 text-primary" /> : 
+                          <Award className="h-5 w-5 text-primary" />}
+                      </div>
+                      {index < achievementTimelineData.length - 1 && (
+                        <div className="h-full w-0.5 bg-border mt-2" />
+                      )}
+                    </div>
+                    <div className="pb-6">
+                      <p className="text-sm text-muted-foreground">{new Date(achievement.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                      <h4 className="text-base font-medium">{achievement.achievement}</h4>
+                      <p className="text-sm text-muted-foreground mt-1">{achievement.description}</p>
+                      <Badge variant="outline" className="mt-2 bg-primary/10">+{achievement.points} points</Badge>
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>

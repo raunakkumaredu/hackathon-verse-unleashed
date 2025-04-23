@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Code, MessageSquare, CalendarClock, ArrowLeft, Plus, Share2, Trophy } from "lucide-react";
+import { Users, Code, MessageSquare, CalendarClock, ArrowLeft, Plus, Share2, Trophy, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 // Mock team data
@@ -18,6 +18,7 @@ const teamData = {
     name: "Code Wizards",
     description: "A team focused on creating innovative solutions using AI and machine learning.",
     createdAt: "April 5, 2025",
+    createdBy: "user123", // Added creator ID
     members: [
       { id: "1", name: "Alex Johnson", role: "Team Lead", avatar: "https://ui-avatars.com/api/?name=AJ&background=random" },
       { id: "2", name: "Sam Smith", role: "UX Designer", avatar: "https://ui-avatars.com/api/?name=SS&background=random" },
@@ -42,6 +43,7 @@ const teamData = {
     name: "Tech Titans",
     description: "Solving cutting-edge problems with innovative tech solutions.",
     createdAt: "April 10, 2025",
+    createdBy: "user456", // Added creator ID
     members: [
       { id: "4", name: "Jordan Lee", role: "Backend Developer", avatar: "https://ui-avatars.com/api/?name=JL&background=random" },
       { id: "5", name: "Casey Taylor", role: "Frontend Developer", avatar: "https://ui-avatars.com/api/?name=CT&background=random" }
@@ -57,6 +59,30 @@ const teamData = {
     meetings: [
       { id: "meet3", title: "Planning Session", date: "April 28, 2025", time: "5:00 PM", location: "Virtual" }
     ]
+  },
+  "team3": {
+    id: "team3",
+    name: "Digital Innovators",
+    description: "Your team focused on digital transformation and innovation.",
+    createdAt: "April 15, 2025",
+    createdBy: "currentUser", // This is your team - using the mock ID that matches current user
+    members: [
+      { id: "currentUser", name: "You", role: "Team Lead", avatar: "https://github.com/shadcn.png" },
+      { id: "6", name: "Robin Chen", role: "Frontend Developer", avatar: "https://ui-avatars.com/api/?name=RC&background=random" },
+      { id: "7", name: "Jamie Garcia", role: "UX Researcher", avatar: "https://ui-avatars.com/api/?name=JG&background=random" }
+    ],
+    skills: ["UI/UX", "React", "TypeScript", "Design Systems"],
+    currentChallenges: [
+      { id: "3", name: "UX Challenge 2025", status: "In Progress", deadline: "May 30, 2025" }
+    ],
+    pastChallenges: [],
+    discussions: [
+      { id: "disc4", author: "You", content: "I've started working on the wireframes for our app.", timestamp: "1 day ago", replies: 2 },
+      { id: "disc5", author: "Robin Chen", content: "I can help with implementing the frontend components.", timestamp: "12 hours ago", replies: 1 }
+    ],
+    meetings: [
+      { id: "meet4", title: "Weekly Sync", date: "April 24, 2025", time: "2:00 PM", location: "Virtual" }
+    ]
   }
 };
 
@@ -65,9 +91,63 @@ const TeamDetailPage = () => {
   const navigate = useNavigate();
   const { authState } = useAuth();
   const userRole = authState.user?.role || "student";
+  const currentUserId = "currentUser"; // In a real app, this would be authState.user?.id
   
-  const team = id ? teamData[id] : null;
+  const [loading, setLoading] = useState(true);
+  const [team, setTeam] = useState<any>(null);
+  const [userTeams, setUserTeams] = useState<string[]>([]);
+
+  // Simulate fetching team data and user's teams
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // In a real app, this would fetch from Supabase
+        setLoading(true);
+        
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        // Set the team data based on ID
+        if (id) {
+          setTeam(teamData[id as keyof typeof teamData] || null);
+        }
+        
+        // Get all teams where the user is a member or creator
+        const userTeamIds = Object.keys(teamData).filter(teamId => {
+          const team = teamData[teamId as keyof typeof teamData];
+          return team.createdBy === currentUserId || 
+                 team.members.some(member => member.id === currentUserId);
+        });
+        
+        setUserTeams(userTeamIds);
+      } catch (error) {
+        console.error("Error fetching team data:", error);
+        toast.error("Failed to load team data");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [id, currentUserId]);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <DashboardLayout
+        title="Team Details"
+        subtitle="View team information"
+        userRole={userRole}
+      >
+        <div className="flex flex-col items-center justify-center py-20">
+          <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+          <h2 className="text-xl font-semibold">Loading team details...</h2>
+        </div>
+      </DashboardLayout>
+    );
+  }
   
+  // Show not found state
   if (!team) {
     return (
       <DashboardLayout
@@ -87,6 +167,12 @@ const TeamDetailPage = () => {
       </DashboardLayout>
     );
   }
+
+  // Show your teams if no specific team is selected
+  if (!id && userTeams.length > 0) {
+    navigate(`/team/${userTeams[0]}`);
+    return null;
+  }
   
   const handlePostDiscussion = () => {
     toast.success("Discussion post created!");
@@ -95,6 +181,9 @@ const TeamDetailPage = () => {
   const handleScheduleMeeting = () => {
     toast.success("Meeting scheduled!");
   };
+
+  // Check if this is the user's own team
+  const isOwnTeam = team.createdBy === currentUserId;
 
   return (
     <DashboardLayout
@@ -120,7 +209,12 @@ const TeamDetailPage = () => {
           </div>
           
           <div className="flex-1">
-            <h1 className="text-2xl md:text-3xl font-bold mb-2">{team.name}</h1>
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-2xl md:text-3xl font-bold">{team.name}</h1>
+              {isOwnTeam && (
+                <Badge variant="outline" className="bg-primary/10">Your Team</Badge>
+              )}
+            </div>
             <p className="text-muted-foreground mb-4">Team created on {team.createdAt}</p>
             <p className="mb-4">{team.description}</p>
             
@@ -177,13 +271,15 @@ const TeamDetailPage = () => {
                         <AvatarFallback>{member.name.substring(0, 2)}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{member.name}</p>
+                        <p className="font-medium">{member.name} {member.id === currentUserId && "(You)"}</p>
                         <p className="text-sm text-muted-foreground">{member.role}</p>
                       </div>
                     </div>
-                    <Button variant="ghost" size="sm">
-                      Message
-                    </Button>
+                    {member.id !== currentUserId && (
+                      <Button variant="ghost" size="sm">
+                        Message
+                      </Button>
+                    )}
                   </div>
                 ))}
               </div>
