@@ -520,12 +520,10 @@ const ChallengeDetailPage = () => {
             onClick={handleRegister} 
             disabled={
               registering || 
-              !hackathon.registrationOpen || 
-              hackathon.participationStatus === "Registered"
+              !hackathon.registrationOpen
             }
           >
-            {registering ? "Processing..." : 
-              hackathon.participationStatus === "Registered" ? "Already Registered" : "Register Now"}
+            {registering ? "Processing..." : "Register Now"}
           </Button>
         )}
       </div>
