@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -39,7 +38,6 @@ const MessagesPage = () => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Mock data for conversations
   useEffect(() => {
     const mockConversations: Conversation[] = [
       {
@@ -57,7 +55,7 @@ const MessagesPage = () => {
             senderName: "Jane Smith",
             senderAvatar: "https://github.com/shadcn.png",
             content: "Hi there! How's your hackathon project coming along?",
-            timestamp: new Date(Date.now() - 86400000), // 1 day ago
+            timestamp: new Date(Date.now() - 86400000),
             read: true,
           },
           {
@@ -65,7 +63,7 @@ const MessagesPage = () => {
             senderId: authState.user?.id || "me",
             senderName: "You",
             content: "Making good progress! Just working on the final features.",
-            timestamp: new Date(Date.now() - 75600000), // ~21 hours ago
+            timestamp: new Date(Date.now() - 75600000),
             read: true,
           },
           {
@@ -74,7 +72,7 @@ const MessagesPage = () => {
             senderName: "Jane Smith",
             senderAvatar: "https://github.com/shadcn.png",
             content: "Looking forward to your project submission!",
-            timestamp: new Date(Date.now() - 3600000), // 1 hour ago
+            timestamp: new Date(Date.now() - 3600000),
             read: false,
           },
         ],
@@ -91,7 +89,7 @@ const MessagesPage = () => {
             senderId: "user-2",
             senderName: "John Doe",
             content: "Would you be interested in joining our team for the AI challenge?",
-            timestamp: new Date(Date.now() - 172800000), // 2 days ago
+            timestamp: new Date(Date.now() - 172800000),
             read: true,
           },
           {
@@ -99,7 +97,7 @@ const MessagesPage = () => {
             senderId: authState.user?.id || "me",
             senderName: "You",
             content: "I might be! What technologies are you planning to use?",
-            timestamp: new Date(Date.now() - 172000000), // ~2 days ago
+            timestamp: new Date(Date.now() - 172000000),
             read: true,
           },
         ],
@@ -116,7 +114,7 @@ const MessagesPage = () => {
             senderId: "user-3",
             senderName: "TechCorp",
             content: "We're impressed with your profile and would like to discuss potential opportunities.",
-            timestamp: new Date(Date.now() - 259200000), // 3 days ago
+            timestamp: new Date(Date.now() - 259200000),
             read: false,
           },
         ],
@@ -155,6 +153,31 @@ const MessagesPage = () => {
     );
 
     setCurrentMessage("");
+    setTimeout(() => {
+      setConversations((prevConversations) =>
+        prevConversations.map((conversation) => {
+          if (conversation.id === activeConversation) {
+            const systemReply: Message = {
+              id: `msg-sys-${Date.now()}`,
+              senderId: conversation.participantId,
+              senderName: conversation.participantName,
+              senderAvatar: conversation.participantAvatar,
+              content: "Thanks for your message! We'll reply soon.",
+              timestamp: new Date(),
+              read: false,
+            };
+            return {
+              ...conversation,
+              lastMessage: systemReply.content,
+              messages: [...conversation.messages, systemReply],
+              unreadCount: conversation.unreadCount + 1,
+            };
+          }
+          return conversation;
+        })
+      );
+    }, 800);
+
     toast.success("Message sent!");
   };
 

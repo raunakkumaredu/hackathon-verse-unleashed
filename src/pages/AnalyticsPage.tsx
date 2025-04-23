@@ -1,10 +1,11 @@
+
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BarChart as BarChartIcon, LineChart, PieChart, CircleDot, BarChartHorizontal, Trophy, Award } from "lucide-react";
+import { BarChart as BarChartIcon, LineChart, PieChart, CircleDot, BarChartHorizontal, Award, Badge as BadgeIcon } from "lucide-react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart as RechartsLineChart, Line, PieChart as RechartsPieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Badge } from "@/components/ui/badge";
@@ -50,6 +51,7 @@ const AnalyticsPage = () => {
     { name: 'Cloud Hack', completed: 80, registered: 100 },
   ];
 
+  // The following are kept for structure but "coming soon" will be shown.
   const skillsGrowthData = [
     { month: 'Jan', javascript: 60, python: 40, react: 55, design: 35 },
     { month: 'Feb', javascript: 65, python: 45, react: 60, design: 40 },
@@ -223,23 +225,16 @@ const AnalyticsPage = () => {
           </div>
         </TabsContent>
         <TabsContent value="skills">
-          <Card className="animate-fade-in animate-delay-300 card-hover">
+          <Card className="animate-fade-in animate-delay-300 card-hover h-96 flex flex-col items-center justify-center">
             <CardHeader>
               <CardTitle>Skills Distribution</CardTitle>
-              <CardDescription>Most popular skills among participants</CardDescription>
+              <CardDescription>Coming Soon</CardDescription>
             </CardHeader>
-            <CardContent className="pt-0">
-              <div className="h-96">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={skillsDistributionData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="skill" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="count" fill="#8884d8" />
-                  </BarChart>
-                </ResponsiveContainer>
+            <CardContent>
+              <div className="flex flex-col items-center justify-center mt-8">
+                <BadgeIcon className="w-16 h-16 text-muted-foreground mb-4" />
+                <div className="text-lg font-bold mb-2">Skills Chart Coming Soon</div>
+                <p className="text-muted-foreground">We are collecting more data to provide a detailed breakdown of skills!</p>
               </div>
             </CardContent>
           </Card>
@@ -278,59 +273,30 @@ const AnalyticsPage = () => {
       </Tabs>
       <div className="mt-8">
         <h2 className="text-2xl font-semibold mb-6">Your Progress</h2>
-        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
+          <Card className="h-80 flex flex-col items-center justify-center">
             <CardHeader>
               <CardTitle>Skills Growth</CardTitle>
-              <CardDescription>Your skill development over time</CardDescription>
+              <CardDescription>Coming Soon</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={skillsGrowthData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis domain={[0, 100]} />
-                    <Tooltip />
-                    <Legend />
-                    <Area type="monotone" dataKey="javascript" stackId="1" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
-                    <Area type="monotone" dataKey="python" stackId="1" stroke="#ffc658" fill="#ffc658" fillOpacity={0.6} />
-                    <Area type="monotone" dataKey="react" stackId="1" stroke="#ffc658" fill="#ffc658" fillOpacity={0.6} />
-                    <Area type="monotone" dataKey="design" stackId="1" stroke="#ff8042" fill="#ff8042" fillOpacity={0.6} />
-                  </AreaChart>
-                </ResponsiveContainer>
+              <div className="flex flex-col items-center justify-center mt-4">
+                <BadgeIcon className="w-14 h-14 text-muted-foreground mb-3" />
+                <div className="text-base font-bold mb-1">Skills Growth Chart Coming Soon</div>
+                <p className="text-muted-foreground max-w-xs text-center">Track your skill advancements over time—this feature is almost ready!</p>
               </div>
             </CardContent>
           </Card>
-          
-          <Card>
+          <Card className="h-80 flex flex-col items-center justify-center">
             <CardHeader>
               <CardTitle>Achievement Timeline</CardTitle>
-              <CardDescription>Your key milestones and accomplishments</CardDescription>
+              <CardDescription>Coming Soon</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {achievementTimelineData.map((achievement, index) => (
-                  <div key={index} className="flex">
-                    <div className="mr-4 flex flex-col items-center">
-                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        {index % 2 === 0 ? 
-                          <Trophy className="h-5 w-5 text-primary" /> : 
-                          <Award className="h-5 w-5 text-primary" />}
-                      </div>
-                      {index < achievementTimelineData.length - 1 && (
-                        <div className="h-full w-0.5 bg-border mt-2" />
-                      )}
-                    </div>
-                    <div className="pb-6">
-                      <p className="text-sm text-muted-foreground">{new Date(achievement.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                      <h4 className="text-base font-medium">{achievement.achievement}</h4>
-                      <p className="text-sm text-muted-foreground mt-1">{achievement.description}</p>
-                      <Badge variant="outline" className="mt-2 bg-primary/10">+{achievement.points} points</Badge>
-                    </div>
-                  </div>
-                ))}
+              <div className="flex flex-col items-center justify-center mt-4">
+                <Award className="w-14 h-14 text-muted-foreground mb-3" />
+                <div className="text-base font-bold mb-1">Achievement Timeline Coming Soon</div>
+                <p className="text-muted-foreground max-w-xs text-center">Visualize your milestones and wins here soon!</p>
               </div>
             </CardContent>
           </Card>
