@@ -162,7 +162,7 @@ const MessagesPage = () => {
               senderId: conversation.participantId,
               senderName: conversation.participantName,
               senderAvatar: conversation.participantAvatar,
-              content: "Thanks for your message! We'll reply soon.",
+              content: "👋 Reply received! Thank you for your message.",
               timestamp: new Date(),
               read: false,
             };
