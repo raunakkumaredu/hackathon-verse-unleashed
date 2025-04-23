@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+
+import React from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,202 +8,26 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Send, Search, Plus } from "lucide-react";
-import { toast } from "sonner";
-
-interface Message {
-  id: string;
-  senderId: string;
-  senderName: string;
-  senderAvatar?: string;
-  content: string;
-  timestamp: Date;
-  read: boolean;
-}
-
-interface Conversation {
-  id: string;
-  participantId: string;
-  participantName: string;
-  participantAvatar?: string;
-  participantRole: string;
-  lastMessage?: string;
-  unreadCount: number;
-  messages: Message[];
-}
-
-const REPLY_MESSAGES = [
-  "Thanks for reaching out!",
-  "👋 Got your message! How can I assist?",
-  "Appreciate your message – I'll get back soon.",
-  "😊 Your message was received!",
-  "Noted! I'll reply soon.",
-  "Thank you! I'm on it.",
-  "👍 Got it. Chat soon.",
-  "Great to hear from you!",
-  "I'll get back to you shortly.",
-  "Message received, thanks!"
-];
+import { useConversations } from "@/hooks/useConversations";
 
 const MessagesPage = () => {
-  const { authState } = useAuth();
-  const [currentMessage, setCurrentMessage] = useState("");
-  const [activeConversation, setActiveConversation] = useState<string | null>(null);
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  useEffect(() => {
-    const mockConversations: Conversation[] = [
-      {
-        id: "1",
-        participantId: "user-1",
-        participantName: "Jane Smith",
-        participantAvatar: "https://github.com/shadcn.png",
-        participantRole: "mentor",
-        lastMessage: "Looking forward to your project submission!",
-        unreadCount: 2,
-        messages: [
-          {
-            id: "msg-1",
-            senderId: "user-1",
-            senderName: "Jane Smith",
-            senderAvatar: "https://github.com/shadcn.png",
-            content: "Hi there! How's your hackathon project coming along?",
-            timestamp: new Date(Date.now() - 86400000),
-            read: true,
-          },
-          {
-            id: "msg-2",
-            senderId: authState.user?.id || "me",
-            senderName: "You",
-            content: "Making good progress! Just working on the final features.",
-            timestamp: new Date(Date.now() - 75600000),
-            read: true,
-          },
-          {
-            id: "msg-3",
-            senderId: "user-1",
-            senderName: "Jane Smith",
-            senderAvatar: "https://github.com/shadcn.png",
-            content: "Looking forward to your project submission!",
-            timestamp: new Date(Date.now() - 3600000),
-            read: false,
-          },
-        ],
-      },
-      {
-        id: "2",
-        participantId: "user-2",
-        participantName: "John Doe",
-        participantRole: "student",
-        unreadCount: 0,
-        messages: [
-          {
-            id: "msg-4",
-            senderId: "user-2",
-            senderName: "John Doe",
-            content: "Would you be interested in joining our team for the AI challenge?",
-            timestamp: new Date(Date.now() - 172800000),
-            read: true,
-          },
-          {
-            id: "msg-5",
-            senderId: authState.user?.id || "me",
-            senderName: "You",
-            content: "I might be! What technologies are you planning to use?",
-            timestamp: new Date(Date.now() - 172000000),
-            read: true,
-          },
-        ],
-      },
-      {
-        id: "3",
-        participantId: "user-3",
-        participantName: "TechCorp",
-        participantRole: "company",
-        unreadCount: 1,
-        messages: [
-          {
-            id: "msg-6",
-            senderId: "user-3",
-            senderName: "TechCorp",
-            content: "We're impressed with your profile and would like to discuss potential opportunities.",
-            timestamp: new Date(Date.now() - 259200000),
-            read: false,
-          },
-        ],
-      },
-    ];
-
-    setConversations(mockConversations);
-    if (mockConversations.length > 0) {
-      setActiveConversation(mockConversations[0].id);
-    }
-  }, [authState.user?.id]);
-
-  const handleSendMessage = () => {
-    if (!currentMessage.trim() || !activeConversation) return;
-
-    const newMessage: Message = {
-      id: `msg-${Date.now()}`,
-      senderId: authState.user?.id || "me",
-      senderName: "You",
-      content: currentMessage,
-      timestamp: new Date(),
-      read: true,
-    };
-
-    setConversations((prevConversations) =>
-      prevConversations.map((conversation) => {
-        if (conversation.id === activeConversation) {
-          return {
-            ...conversation,
-            lastMessage: currentMessage,
-            messages: [...conversation.messages, newMessage],
-          };
-        }
-        return conversation;
-      })
-    );
-
-    setCurrentMessage("");
-    setTimeout(() => {
-      setConversations((prevConversations) =>
-        prevConversations.map((conversation) => {
-          if (conversation.id === activeConversation) {
-            const replyContent = REPLY_MESSAGES[Math.floor(Math.random() * REPLY_MESSAGES.length)];
-            const systemReply: Message = {
-              id: `msg-sys-${Date.now()}`,
-              senderId: conversation.participantId,
-              senderName: conversation.participantName,
-              senderAvatar: conversation.participantAvatar,
-              content: replyContent,
-              timestamp: new Date(),
-              read: false,
-            };
-            return {
-              ...conversation,
-              lastMessage: systemReply.content,
-              messages: [...conversation.messages, systemReply],
-              unreadCount: conversation.unreadCount + 1,
-            };
-          }
-          return conversation;
-        })
-      );
-    }, 800);
-
-    toast.success("Message sent!");
-  };
-
-  const filteredConversations = conversations.filter((conversation) =>
-    conversation.participantName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const {
+    conversations,
+    filteredConversations,
+    activeConversation,
+    setActiveConversation,
+    activeConvo,
+    currentMessage,
+    setCurrentMessage,
+    handleSendMessage,
+    searchQuery,
+    setSearchQuery,
+  } = useConversations();
 
   const formatTime = (date: Date) => {
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const diffDays = Math.floor(diff / (1000 * 60 * 60 * 24));
-
     if (diffDays === 0) {
       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     } else if (diffDays === 1) {
@@ -215,13 +39,11 @@ const MessagesPage = () => {
     }
   };
 
-  const activeConvo = conversations.find((c) => c.id === activeConversation);
-
   return (
     <DashboardLayout
       title="Messages"
       subtitle="Connect with participants, mentors, and companies"
-      userRole={authState.user?.role || "student"}
+      userRole="student"
     >
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[calc(100vh-200px)] animate-fade-in">
         <Card className="md:col-span-1 overflow-hidden">
@@ -311,8 +133,7 @@ const MessagesPage = () => {
               <ScrollArea className="flex-1 p-4 h-[calc(100vh-340px)]">
                 <div className="space-y-4">
                   {activeConvo.messages.map((message) => {
-                    const isOwnMessage = message.senderId === authState.user?.id || message.senderId === "me";
-
+                    const isOwnMessage = message.senderId === "me" || message.senderName === "You";
                     return (
                       <div
                         key={message.id}
@@ -395,3 +216,4 @@ const MessagesPage = () => {
 };
 
 export default MessagesPage;
+
