@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -133,7 +134,7 @@ const ChallengeDetailPage = () => {
   const renderRegistrationButtons = () => {
     const participationStatus = hackathon?.participationStatus;
 
-    if (participationStatus === "Registered") {
+    if (participationStatus && participationStatus === "Registered") {
       return (
         <div className="flex flex-col sm:flex-row gap-4 w-full">
           <Button className="flex-1 bg-green-600 hover:bg-green-700" disabled>
@@ -146,7 +147,7 @@ const ChallengeDetailPage = () => {
       );
     }
 
-    if (participationStatus === "Interested") {
+    if (participationStatus && participationStatus === "Interested") {
       return (
         <div className="flex flex-col sm:flex-row gap-4 w-full">
           <Button 
@@ -518,10 +519,9 @@ const ChallengeDetailPage = () => {
         {hackathon.participationStatus !== "Registered" && (
           <Button 
             onClick={handleRegister} 
-            disabled={registering || !hackathon.registrationOpen || hackathon.participationStatus === "Registered"}
+            disabled={registering || !hackathon.registrationOpen}
           >
-            {registering ? "Processing..." : 
-             hackathon.participationStatus === "Registered" ? "Already Registered" : "Register Now"}
+            {registering ? "Processing..." : "Register Now"}
           </Button>
         )}
       </div>
