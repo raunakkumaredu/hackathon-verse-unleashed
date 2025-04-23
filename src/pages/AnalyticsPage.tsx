@@ -1,19 +1,18 @@
-
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BarChart as BarChartIcon, LineChart, PieChart, CircleDot, BarChartHorizontal } from "lucide-react";
+import { BarChart as BarChartIcon, LineChart, PieChart, CircleDot, BarChartHorizontal, Trophy, Award } from "lucide-react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart as RechartsLineChart, Line, PieChart as RechartsPieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Badge } from "@/components/ui/badge";
 
 const AnalyticsPage = () => {
   const { authState } = useAuth();
   const [timeFilter, setTimeFilter] = useState("all");
   
-  // Mock chart data
   const hackathonParticipationData = [
     { name: 'Jan', participants: 150 },
     { name: 'Feb', participants: 180 },
@@ -51,7 +50,6 @@ const AnalyticsPage = () => {
     { name: 'Cloud Hack', completed: 80, registered: 100 },
   ];
 
-  // New: Skills growth data
   const skillsGrowthData = [
     { month: 'Jan', javascript: 60, python: 40, react: 55, design: 35 },
     { month: 'Feb', javascript: 65, python: 45, react: 60, design: 40 },
@@ -61,7 +59,6 @@ const AnalyticsPage = () => {
     { month: 'Jun', javascript: 90, python: 75, react: 88, design: 65 },
   ];
   
-  // New: Achievement timeline data
   const achievementTimelineData = [
     { 
       date: '2025-01-15', 
@@ -95,7 +92,6 @@ const AnalyticsPage = () => {
     },
   ];
   
-  // Function to handle time filter changes
   const handleTimeFilterChange = (value: string) => {
     setTimeFilter(value);
   };
@@ -120,7 +116,6 @@ const AnalyticsPage = () => {
         </Select>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {/* Make cards bounce/fade in for a young effect */}
         <Card className="glass-card animate-fade-in animate-delay-100 card-hover">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Hackathons</CardTitle>
@@ -158,7 +153,6 @@ const AnalyticsPage = () => {
           </CardContent>
         </Card>
       </div>
-      {/* Add float/fade young vibes on tabs and charts */}
       <Tabs defaultValue="participation">
         <TabsList className="mb-6 animate-fade-in animate-delay-200">
           <TabsTrigger value="participation" className="flex items-center gap-2">
@@ -174,7 +168,6 @@ const AnalyticsPage = () => {
             <BarChartHorizontal className="h-4 w-4" /> Performance
           </TabsTrigger>
         </TabsList>
-        {/* Each TabsContent uses fade-in/fade-out and young gradients */}
         <TabsContent value="participation">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card className="animate-fade-in card-hover">
@@ -283,7 +276,6 @@ const AnalyticsPage = () => {
           </Card>
         </TabsContent>
       </Tabs>
-      {/* Personal Progress Section with implemented Skills Growth Chart and Achievement Timeline */}
       <div className="mt-8">
         <h2 className="text-2xl font-semibold mb-6">Your Progress</h2>
         
@@ -303,7 +295,7 @@ const AnalyticsPage = () => {
                     <Tooltip />
                     <Legend />
                     <Area type="monotone" dataKey="javascript" stackId="1" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
-                    <Area type="monotone" dataKey="python" stackId="1" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.6} />
+                    <Area type="monotone" dataKey="python" stackId="1" stroke="#ffc658" fill="#ffc658" fillOpacity={0.6} />
                     <Area type="monotone" dataKey="react" stackId="1" stroke="#ffc658" fill="#ffc658" fillOpacity={0.6} />
                     <Area type="monotone" dataKey="design" stackId="1" stroke="#ff8042" fill="#ff8042" fillOpacity={0.6} />
                   </AreaChart>
