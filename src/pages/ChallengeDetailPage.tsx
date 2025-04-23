@@ -130,6 +130,60 @@ const ChallengeDetailPage = () => {
     }
   };
   
+  const renderRegistrationButtons = () => {
+    const participationStatus = hackathon?.participationStatus;
+
+    if (participationStatus === "Registered") {
+      return (
+        <div className="flex flex-col sm:flex-row gap-4 w-full">
+          <Button className="flex-1 bg-green-600 hover:bg-green-700" disabled>
+            ✓ Registered
+          </Button>
+          <Button variant="outline" className="flex-1" onClick={() => navigate(`/teams?hackathon=${hackathon?.id}`)}>
+            Join or Create Team
+          </Button>
+        </div>
+      );
+    }
+
+    if (participationStatus === "Interested") {
+      return (
+        <div className="flex flex-col sm:flex-row gap-4 w-full">
+          <Button 
+            className="flex-1" 
+            disabled={registering || !hackathon?.registrationOpen}
+            onClick={handleRegister}
+          >
+            {registering ? "Processing..." : "Register Now"}
+          </Button>
+          <Button variant="outline" className="flex-1" disabled>
+            Marked as Interested
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-col sm:flex-row gap-4 w-full">
+        <Button 
+          className="flex-1" 
+          disabled={registering || !hackathon?.registrationOpen}
+          onClick={handleRegister}
+        >
+          {registering ? "Processing..." : "Register Now"}
+        </Button>
+        <Button 
+          variant="outline" 
+          className="flex-1"
+          disabled={registering}
+          onClick={handleMarkInterested}
+        >
+          {registering ? "Processing..." : "I'm Interested"}
+        </Button>
+      </div>
+    );
+  };
+
   if (isLoading) {
     return (
       <DashboardLayout 
@@ -168,8 +222,8 @@ const ChallengeDetailPage = () => {
   
   return (
     <DashboardLayout 
-      title={hackathon.title} 
-      subtitle={`Organized by ${hackathon.company}`} 
+      title={hackathon?.title || "Challenge Details"} 
+      subtitle={`Organized by ${hackathon?.company || "Unknown"}`} 
       userRole={authState.user?.role}
     >
       <div className="mb-6">
@@ -260,47 +314,7 @@ const ChallengeDetailPage = () => {
         </CardContent>
         
         <CardFooter className="flex flex-col sm:flex-row gap-4">
-          {hackathon.participationStatus === "Registered" ? (
-            <div className="flex flex-col sm:flex-row gap-4 w-full">
-              <Button className="flex-1 bg-green-600 hover:bg-green-700" disabled>
-                ✓ Registered
-              </Button>
-              <Button variant="outline" className="flex-1" onClick={() => navigate(`/teams?hackathon=${hackathon.id}`)}>
-                Join or Create Team
-              </Button>
-            </div>
-          ) : hackathon.participationStatus === "Interested" ? (
-            <div className="flex flex-col sm:flex-row gap-4 w-full">
-              <Button 
-                className="flex-1" 
-                disabled={registering || !hackathon.registrationOpen}
-                onClick={handleRegister}
-              >
-                {registering ? "Processing..." : "Register Now"}
-              </Button>
-              <Button variant="outline" className="flex-1" disabled>
-                Marked as Interested
-              </Button>
-            </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row gap-4 w-full">
-              <Button 
-                className="flex-1" 
-                disabled={registering || !hackathon.registrationOpen}
-                onClick={handleRegister}
-              >
-                {registering ? "Processing..." : "Register Now"}
-              </Button>
-              <Button 
-                variant="outline" 
-                className="flex-1"
-                disabled={registering}
-                onClick={handleMarkInterested}
-              >
-                {registering ? "Processing..." : "I'm Interested"}
-              </Button>
-            </div>
-          )}
+          {renderRegistrationButtons()}
         </CardFooter>
       </Card>
       
