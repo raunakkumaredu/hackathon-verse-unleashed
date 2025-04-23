@@ -1,5 +1,4 @@
-
-import { supabase } from '@/lib/supabase';
+import { supabase, isDemoMode, isConnectionError } from '@/lib/supabase';
 import { User } from '@/types/auth';
 import { toast } from 'sonner';
 
@@ -22,8 +21,77 @@ export interface HackathonWithParticipation {
   participationStatus?: "Registered" | "Interested" | null;
 }
 
+// Demo data to use when Supabase is not configured
+const demoHackathons: HackathonWithParticipation[] = [
+  {
+    id: "demo-1",
+    title: "AI Innovation Challenge",
+    description: "Build innovative solutions using artificial intelligence and machine learning",
+    company: "TechCorp",
+    logo: "https://ui-avatars.com/api/?name=TC&background=random",
+    startDate: "2025-05-15",
+    endDate: "2025-05-22",
+    status: "Upcoming",
+    participants: 120,
+    registrationOpen: true,
+    prizePool: "$5,000",
+    tags: ["AI", "Machine Learning", "Innovation"],
+    difficulty: "Intermediate",
+    organizerId: "demo-org-1",
+    createdAt: "2025-04-01"
+  },
+  {
+    id: "demo-2",
+    title: "Blockchain Revolution",
+    description: "Develop blockchain applications to solve real-world problems",
+    company: "CryptoInnovate",
+    logo: "https://ui-avatars.com/api/?name=CI&background=random",
+    startDate: "2025-06-10",
+    endDate: "2025-06-17",
+    status: "Upcoming",
+    participants: 85,
+    registrationOpen: true,
+    prizePool: "$3,500",
+    tags: ["Blockchain", "Web3", "DeFi"],
+    difficulty: "Advanced",
+    organizerId: "demo-org-2",
+    createdAt: "2025-04-05"
+  },
+  {
+    id: "demo-3",
+    title: "Sustainability Hackathon",
+    description: "Create technology solutions for environmental sustainability",
+    company: "EcoTech",
+    logo: "https://ui-avatars.com/api/?name=ET&background=random",
+    startDate: "2025-07-01",
+    endDate: "2025-07-08",
+    status: "Upcoming",
+    participants: 95,
+    registrationOpen: true,
+    prizePool: "$4,000",
+    tags: ["Sustainability", "CleanTech", "Environment"],
+    difficulty: "Beginner",
+    organizerId: "demo-org-3",
+    createdAt: "2025-04-10"
+  }
+];
+
 export const fetchAllHackathons = async (userId?: string): Promise<HackathonWithParticipation[]> => {
   try {
+    // If in demo mode, return demo data
+    if (isDemoMode) {
+      console.log('Using demo hackathon data (Supabase not configured)');
+      
+      // If userId is provided, add some fake participation data
+      if (userId) {
+        return demoHackathons.map((h, i) => ({
+          ...h,
+          participationStatus: i === 0 ? "Registered" : i === 1 ? "Interested" : undefined
+        }));
+      }
+      return demoHackathons;
+    }
+    
     const { data: hackathons, error } = await supabase
       .from('hackathons')
       .select('*')
@@ -31,8 +99,15 @@ export const fetchAllHackathons = async (userId?: string): Promise<HackathonWith
 
     if (error) {
       console.error('Error fetching hackathons:', error);
-      toast.error('Failed to load hackathons');
-      return [];
+      
+      if (isConnectionError(error)) {
+        toast.error('Connection to database failed - check your network or configuration');
+      } else {
+        toast.error('Failed to load hackathons');
+      }
+      
+      // Fall back to demo data on error
+      return demoHackathons;
     }
 
     let participationData: Record<string, string> = {};
@@ -74,7 +149,9 @@ export const fetchAllHackathons = async (userId?: string): Promise<HackathonWith
   } catch (error) {
     console.error('Unexpected error fetching hackathons:', error);
     toast.error('Something went wrong while loading hackathons');
-    return [];
+    
+    // Fall back to demo data on error
+    return demoHackathons;
   }
 };
 
