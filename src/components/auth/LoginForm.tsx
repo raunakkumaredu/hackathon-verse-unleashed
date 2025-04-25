@@ -163,7 +163,7 @@ export const LoginForm = () => {
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="you@example.com"
+                        placeholder="sachin@example.com"
                         type="email"
                         autoComplete="email"
                         className="bg-white/50 dark:bg-black/20"
