@@ -29,9 +29,9 @@ const submissions = [
     projectName: "EcoTrack",
     teamName: "GreenTech",
     teamMembers: [
-      { id: "1", name: "Alex Johnson", avatar: "https://github.com/shadcn.png" },
-      { id: "2", name: "Samantha Lee", avatar: "" },
-      { id: "3", name: "Michael Chen", avatar: "" },
+      { id: "1", name: "Amrita kumari", avatar: "https://github.com/shadcn.png" },
+      { id: "2", name: "Samantha Singh", avatar: "" },
+      { id: "3", name: "Singh sher", avatar: "" },
     ],
     category: "Sustainability",
     description: "A mobile app that helps users track and reduce their carbon footprint through gamification.",

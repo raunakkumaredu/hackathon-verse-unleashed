@@ -27,9 +27,9 @@ const sponsoredEvents = [
     attendees: 250,
     featured: true,
     speakers: [
-      { name: "Alex Chen", title: "CTO, TechCorp", avatar: "" },
-      { name: "Sarah Johnson", title: "AI Research Lead, TechCorp", avatar: "" },
-      { name: "Michael Brown", title: "VP of Innovation, TechCorp", avatar: "" },
+      { name: "Monika chorurasi", title: "CTO, TechCorp", avatar: "" },
+      { name: "Sourabh ppatel", title: "AI Research Lead, TechCorp", avatar: "" },
+      { name: "Amrita Kumari", title: "VP of Innovation, TechCorp", avatar: "" },
     ],
     agenda: [
       { time: "09:00 AM", title: "Registration & Welcome" },

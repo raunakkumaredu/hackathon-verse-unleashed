@@ -37,7 +37,7 @@ const StudentsPage = () => {
     },
     {
       id: "3",
-      name: "Riley Johnson",
+      name: "Sachin SIngh",
       department: "Design",
       year: "Sophomore",
       achievements: ["UI/UX Master", "Adobe Scholar"],
@@ -47,7 +47,7 @@ const StudentsPage = () => {
     },
     {
       id: "4",
-      name: "Casey Smith",
+      name: "Vicky singh",
       department: "Engineering",
       year: "Senior",
       achievements: ["IEEE Member", "Robotics Team"],
@@ -57,7 +57,7 @@ const StudentsPage = () => {
     },
     {
       id: "5",
-      name: "Alex Wong",
+      name: "Abhinav Jha ",
       department: "Business",
       year: "Junior",
       achievements: ["Entrepreneur Society", "Case Competition Winner"],

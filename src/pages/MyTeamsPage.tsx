@@ -22,9 +22,9 @@ const mockTeams = [
     name: "Code Wizards",
     description: "A team focused on creating innovative solutions using AI and machine learning.",
     members: [
-      { id: "1", name: "Alex Johnson", role: "Team Lead", avatar: "https://ui-avatars.com/api/?name=AJ&background=random" },
-      { id: "2", name: "Sam Smith", role: "UX Designer", avatar: "https://ui-avatars.com/api/?name=SS&background=random" },
-      { id: "3", name: "Taylor Reed", role: "Data Scientist", avatar: "https://ui-avatars.com/api/?name=TR&background=random" }
+      { id: "1", name: "Sachin Singh", role: "Team Lead", avatar: "https://ui-avatars.com/api/?name=AJ&background=random" },
+      { id: "2", name: "Ravi kumar", role: "UX Designer", avatar: "https://ui-avatars.com/api/?name=SS&background=random" },
+      { id: "3", name: "Sher Singh", role: "Data Scientist", avatar: "https://ui-avatars.com/api/?name=TR&background=random" }
     ],
     skills: ["React", "Python", "Machine Learning", "UI/UX"],
     hackathonId: "1",

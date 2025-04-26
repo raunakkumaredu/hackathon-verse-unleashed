@@ -173,7 +173,7 @@ export const RegisterForm = () => {
                     <FormLabel>Full Name</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="John Doe"
+                        placeholder="Sachin Singh"
                         className="bg-white/50 dark:bg-black/20"
                         {...field}
                       />
