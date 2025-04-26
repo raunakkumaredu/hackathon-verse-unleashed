@@ -36,7 +36,7 @@ const mockMessages = [
   {
     id: "1",
     senderId: "user1",
-    senderName: "Alex Johnson",
+    senderName: "Sachin Singh",
     senderAvatar: "https://ui-avatars.com/api/?name=AJ&background=random",
     content: "Hey team, I pushed some changes to our repository. Could you review the PR?",
     timestamp: new Date(2025, 3, 22, 10, 0),
@@ -45,7 +45,7 @@ const mockMessages = [
   {
     id: "2",
     senderId: "user2",
-    senderName: "Sam Smith",
+    senderName: "Priya Patel",
     senderAvatar: "https://ui-avatars.com/api/?name=SS&background=random",
     content: "I'll take a look at it in about an hour!",
     timestamp: new Date(2025, 3, 22, 10, 5),
@@ -78,7 +78,7 @@ const mockResources = [
     name: "Project Architecture",
     type: "image",
     url: "https://placehold.co/600x400",
-    uploadedBy: "Alex Johnson",
+    uploadedBy: "Saurabh Singh",
     timestamp: "Yesterday"
   },
   {
@@ -94,16 +94,16 @@ const mockResources = [
     name: "Team Meeting",
     type: "recording",
     url: "#",
-    uploadedBy: "Sam Smith",
+    uploadedBy: "Bhaskar Singh",
     timestamp: "April 20, 2025"
   }
 ];
 
 // Mock team members
 const mockTeamMembers = [
-  { id: "1", name: "Alex Johnson", role: "Team Lead", avatar: "https://ui-avatars.com/api/?name=AJ&background=random", isOnline: true },
-  { id: "2", name: "Sam Smith", role: "UX Designer", avatar: "https://ui-avatars.com/api/?name=SS&background=random", isOnline: false },
-  { id: "3", name: "Taylor Reed", role: "Data Scientist", avatar: "https://ui-avatars.com/api/?name=TR&background=random", isOnline: true },
+  { id: "1", name: "Sachin Kumar", role: "Team Lead", avatar: "https://ui-avatars.com/api/?name=AJ&background=random", isOnline: true },
+  { id: "2", name: "Amitabh bachan", role: "UX Designer", avatar: "https://ui-avatars.com/api/?name=SS&background=random", isOnline: false },
+  { id: "3", name: "Piyush Sharma", role: "Data Scientist", avatar: "https://ui-avatars.com/api/?name=TR&background=random", isOnline: true },
   { id: "4", name: "You", role: "Developer", avatar: "https://github.com/shadcn.png", isOnline: true }
 ];
 

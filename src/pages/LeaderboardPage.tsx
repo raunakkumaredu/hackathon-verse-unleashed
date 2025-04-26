@@ -78,7 +78,7 @@ const LeaderboardPage = () => {
     {
       id: "1",
       rank: 1,
-      name: "Alex Johnson",
+      name: "Raunak kumar",
       avatarUrl: "https://ui-avatars.com/api/?name=AJ&background=random",
       score: 780,
       organization: "MIT",

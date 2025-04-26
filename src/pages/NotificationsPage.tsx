@@ -39,7 +39,7 @@ const NotificationsPage = () => {
     {
       id: "4",
       title: "New mentor available",
-      description: "Sarah Johnson is available for mentorship",
+      description: "Sachin Sachin is available for mentorship",
       time: "3 days ago",
       type: "mentor",
       read: true,

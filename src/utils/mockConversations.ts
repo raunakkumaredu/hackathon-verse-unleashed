@@ -44,14 +44,14 @@ export function getMockConversations(authState: AuthState): Conversation[] {
     {
       id: "2",
       participantId: "user-2",
-      participantName: "John Doe",
+      participantName: "Sachin Singh",
       participantRole: "student",
       unreadCount: 0,
       messages: [
         {
           id: "msg-4",
           senderId: "user-2",
-          senderName: "John Doe",
+          senderName: "Ravi Kumar",
           content: "Would you be interested in joining our team for the AI challenge?",
           timestamp: new Date(Date.now() - 172800000),
           read: true,

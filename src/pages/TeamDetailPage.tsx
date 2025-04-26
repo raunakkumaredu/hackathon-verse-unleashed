@@ -20,9 +20,9 @@ const teamData = {
     createdAt: "April 5, 2025",
     createdBy: "user123", // Added creator ID
     members: [
-      { id: "1", name: "Alex Johnson", role: "Team Lead", avatar: "https://ui-avatars.com/api/?name=AJ&background=random" },
-      { id: "2", name: "Sam Smith", role: "UX Designer", avatar: "https://ui-avatars.com/api/?name=SS&background=random" },
-      { id: "3", name: "Taylor Reed", role: "Data Scientist", avatar: "https://ui-avatars.com/api/?name=TR&background=random" }
+      { id: "1", name: "Sachin Kumar", role: "Team Lead", avatar: "https://ui-avatars.com/api/?name=AJ&background=random" },
+      { id: "2", name: "Ravi Singh", role: "UX Designer", avatar: "https://ui-avatars.com/api/?name=SS&background=random" },
+      { id: "3", name: "OM singh", role: "Data Scientist", avatar: "https://ui-avatars.com/api/?name=TR&background=random" }
     ],
     skills: ["React", "Python", "Machine Learning", "UI/UX"],
     currentChallenges: [
@@ -30,8 +30,8 @@ const teamData = {
     ],
     pastChallenges: [],
     discussions: [
-      { id: "disc1", author: "Alex Johnson", content: "Let's start brainstorming ideas for the AI challenge.", timestamp: "2 days ago", replies: 3 },
-      { id: "disc2", author: "Sam Smith", content: "I've found some interesting research papers that might help us.", timestamp: "1 day ago", replies: 1 }
+      { id: "disc1", author: "Sachin Kumar", content: "Let's start brainstorming ideas for the AI challenge.", timestamp: "2 days ago", replies: 3 },
+      { id: "disc2", author: "Bhaskar kumar", content: "I've found some interesting research papers that might help us.", timestamp: "1 day ago", replies: 1 }
     ],
     meetings: [
       { id: "meet1", title: "Kickoff Meeting", date: "April 25, 2025", time: "3:00 PM", location: "Virtual" },

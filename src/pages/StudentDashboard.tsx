@@ -15,9 +15,9 @@ export const StudentDashboard = () => {
   const navigate = useNavigate();
   
   const teamMembers = [
-    { id: "1", name: "Alex Johnson", role: "Full Stack Developer", avatar: "https://ui-avatars.com/api/?name=AJ&background=random" },
-    { id: "2", name: "Sam Smith", role: "UX Designer", avatar: "https://ui-avatars.com/api/?name=SS&background=random" },
-    { id: "3", name: "Taylor Reed", role: "Data Scientist", avatar: "https://ui-avatars.com/api/?name=TR&background=random" }
+    { id: "1", name: "Sachin Kumar", role: "Full Stack Developer", avatar: "https://ui-avatars.com/api/?name=AJ&background=random" },
+    { id: "2", name: "Ravi singh", role: "UX Designer", avatar: "https://ui-avatars.com/api/?name=SS&background=random" },
+    { id: "3", name: "Om Bhaskar", role: "Data Scientist", avatar: "https://ui-avatars.com/api/?name=TR&background=random" }
   ];
   
   const achievements = [

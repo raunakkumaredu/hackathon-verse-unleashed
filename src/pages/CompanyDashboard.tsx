@@ -40,7 +40,7 @@ const CompanyDashboard = () => {
   const topTalent = [
     { 
       id: "1", 
-      name: "Alex Johnson", 
+      name: "Sachin Kumar", 
       skills: ["AI", "Machine Learning", "Python"], 
       university: "MIT", 
       avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop",

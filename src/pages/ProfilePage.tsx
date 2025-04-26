@@ -92,7 +92,7 @@ const ProfilePage: React.FC = () => {
                         <FormItem>
                           <FormLabel>Full Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="John Doe" {...field} />
+                            <Input placeholder="Sachin Singh" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -105,7 +105,7 @@ const ProfilePage: React.FC = () => {
                         <FormItem>
                           <FormLabel>Email</FormLabel>
                           <FormControl>
-                            <Input placeholder="john@example.com" {...field} />
+                            <Input placeholder="kumar@example.com" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

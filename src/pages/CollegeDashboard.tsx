@@ -36,9 +36,9 @@ const CollegeDashboard = () => {
   ];
   
   const topStudents = [
-    { id: "1", name: "Morgan Lee", department: "Computer Science", achievements: ["Hackathon Winner", "3.9 GPA"], avatar: "https://ui-avatars.com/api/?name=ML&background=random" },
-    { id: "2", name: "Jordan Taylor", department: "Data Science", achievements: ["Research Assistant", "ML Specialist"], avatar: "https://ui-avatars.com/api/?name=JT&background=random" },
-    { id: "3", name: "Riley Johnson", department: "Design", achievements: ["UI/UX Master", "Adobe Scholar"], avatar: "https://ui-avatars.com/api/?name=RJ&background=random" }
+    { id: "1", name: "om kumar", department: "Computer Science", achievements: ["Hackathon Winner", "3.9 GPA"], avatar: "https://ui-avatars.com/api/?name=ML&background=random" },
+    { id: "2", name: "Ravi singh", department: "Data Science", achievements: ["Research Assistant", "ML Specialist"], avatar: "https://ui-avatars.com/api/?name=JT&background=random" },
+    { id: "3", name: "Sachin kumar", department: "Design", achievements: ["UI/UX Master", "Adobe Scholar"], avatar: "https://ui-avatars.com/api/?name=RJ&background=random" }
   ];
   
   const partnerCompanies = [

@@ -18,7 +18,7 @@ const MenteesPage = () => {
   const mentees = [
     {
       id: "1",
-      name: "Alex Johnson",
+      name: "Sachin Kumar",
       avatar: "https://ui-avatars.com/api/?name=AJ&background=random",
       project: "AI Assistant App",
       nextSession: "May 5, 2025",

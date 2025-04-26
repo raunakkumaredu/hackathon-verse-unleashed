@@ -14,7 +14,7 @@ import { toast } from "sonner";
 const mockProfiles = [
   {
     id: "1",
-    name: "Sarah Johnson",
+    name: "Raunak kumar",
     role: "Student",
     college: "MIT",
     skills: ["Machine Learning", "Python", "Data Science"],
@@ -25,7 +25,7 @@ const mockProfiles = [
   },
   {
     id: "2",
-    name: "David Chen",
+    name: "Sachin kumar",
     role: "Student",
     college: "Stanford University",
     skills: ["Web Development", "React", "JavaScript"],
@@ -47,7 +47,7 @@ const mockProfiles = [
   },
   {
     id: "4",
-    name: "James Wilson",
+    name: "Ravi bhaskar",
     role: "Company Representative",
     company: "Microsoft",
     skills: ["Recruitment", "Project Management", "AI"],
@@ -58,7 +58,7 @@ const mockProfiles = [
   },
   {
     id: "5",
-    name: "Lisa Rodriguez",
+    name: "priya kuamri",
     role: "Student",
     college: "UC Berkeley",
     skills: ["UI/UX Design", "Figma", "User Research"],
@@ -69,7 +69,7 @@ const mockProfiles = [
   },
   {
     id: "6",
-    name: "Michael Kim",
+    name: "Nilesh sharma",
     role: "Mentor",
     company: "Amazon",
     skills: ["Backend Development", "Distributed Systems", "Java"],
