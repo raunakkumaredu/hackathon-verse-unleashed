@@ -21,7 +21,7 @@ const sponsoredEvents = [
     sponsorLogo: "https://github.com/shadcn.png",
     date: "July 10, 2025",
     time: "09:00 AM - 05:00 PM",
-    location: "TechCorp HQ, San Francisco",
+    location: "TechCorp HQ, Farukhnagar",
     description: "A full-day summit bringing together industry leaders, innovators, and students to explore cutting-edge technologies and future trends.",
     category: "Summit",
     attendees: 250,
